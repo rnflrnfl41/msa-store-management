@@ -1,0 +1,8 @@
+rootProject.name = 'msa-store-management'
+
+include 'api-gateway'
+include 'discovery-service'
+include 'customer-service'
+//include 'sales-service'
+//include 'point-service'
+//include 'common'
