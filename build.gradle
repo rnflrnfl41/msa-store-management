@@ -1,37 +1,19 @@
-//plugins {
-//    id 'java'
-//}
-//
-//group = 'org.example'
-//version = '1.0-SNAPSHOT'
-//
-//repositories {
-//    mavenCentral()
-//}
-//
-//dependencies {
-//    testImplementation platform('org.junit:junit-bom:5.9.1')
-//    testImplementation 'org.junit.jupiter:junit-jupiter'
-//}
-//
-//test {
-//    useJUnitPlatform()
-//}
-
-buildscript {
-    ext {
-        springBootVersion = '3.3.5'
-        springCloudVersion = '2023.0.3'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("io.spring.gradle:dependency-management-plugin:1.1.7")
-    }
+//이 프로젝트에서 사용 할 공통 플러그인의 버전을 정의
+//apply false란? 현재 루트 플젝에선 사용하지 않음을 의미
+//아래 subprojects -> apply plugin 에 똑같이 적용 해야함 (둘중에 하나라도 없음 에러)
+plugins {
+    id 'org.springframework.boot' version '3.3.5' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'java'
 }
 
+//프로젝트 전체에 사용할 전역 변수 선언
+ext {
+    springBootVersion = '3.3.5'
+    springCloudVersion = '2023.0.3'
+}
+
+//모든 플젝이 공유할 기본 설정
 allprojects {
     group = 'com.example'
     version = '0.0.1-SNAPSHOT'
@@ -46,20 +28,25 @@ subprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    sourceCompatibility = '17'
-    targetCompatibility = '17'
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
+    //Spring Cloud 라이브러리 버전 관리
     dependencyManagement {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
     }
 
+    //모든 프로젝트 공통 테스트 라이브러리
     dependencies {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 
-    test {
+    //테스트 실행 방식 설정
+    tasks.named('test') {
         useJUnitPlatform()
     }
 }
