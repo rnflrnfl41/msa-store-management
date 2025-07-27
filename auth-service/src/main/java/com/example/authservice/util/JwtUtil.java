@@ -1,6 +1,7 @@
 package com.example.authservice.util;
 
 
+import com.example.authservice.entity.UserInfo;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +27,10 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(int userIdx, String loginId, String companyCode) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(userIdx));
-        claims.put("loginId", loginId);
-        claims.put("companyCode", companyCode);
+    public String createToken(UserInfo userInfo) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userInfo.getIdx()));
+        claims.put("loginId", userInfo.getLoginId());
+        claims.put("name", userInfo.getName());
 
         Date now = new Date();
 
