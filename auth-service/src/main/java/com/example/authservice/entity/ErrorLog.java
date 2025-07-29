@@ -24,7 +24,7 @@ public class ErrorLog {
     private String errorId;
 
     @Lob
-    @Column(name = "message")
+    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
     @Size(max = 50)
@@ -46,7 +46,7 @@ public class ErrorLog {
     private String method;
 
     @Lob
-    @Column(name = "stack_trace")
+    @Column(name = "stack_trace", columnDefinition = "TEXT")
     private String stackTrace;
 
 }
