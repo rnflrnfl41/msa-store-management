@@ -2,10 +2,13 @@ package com.example.authservice.controller;
 
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
+import com.example.authservice.entity.UserInfo;
 import com.example.authservice.service.AuthService;
 import com.example.authservice.util.ApiResponse;
+import com.example.authservice.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +25,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @RequestBody LoginRequest loginRequest) {
         LoginResponse response = authService.login(loginRequest);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseUtil.success(response);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<ApiResponse<String>> signup(@RequestBody UserInfo userInfo) {
+        authService.signup(userInfo);
+        return ResponseUtil.created("회원가입 완료");
     }
 
 }

@@ -48,4 +48,8 @@ public class AuthService {
         return response;
     }
 
+    public void signup(UserInfo userInfo) {
+        userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+        userInfoRepository.save(userInfo);
+    }
 }
