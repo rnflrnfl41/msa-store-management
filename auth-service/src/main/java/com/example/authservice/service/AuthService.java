@@ -1,11 +1,11 @@
 package com.example.authservice.service;
 
-import com.example.JwtUtil;
+import com.example.util.JwtUtil;
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
 import com.example.authservice.entity.UserInfo;
-import com.example.CommonException;
-import com.example.CommonExceptionCode;
+import com.example.exception.CommonException;
+import com.example.exception.CommonExceptionCode;
 import com.example.authservice.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

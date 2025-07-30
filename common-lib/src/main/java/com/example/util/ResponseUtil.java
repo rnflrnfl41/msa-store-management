@@ -1,5 +1,6 @@
-package com.example.authservice.util;
+package com.example.util;
 
+import com.example.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

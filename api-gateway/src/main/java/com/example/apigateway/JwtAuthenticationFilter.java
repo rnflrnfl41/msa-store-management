@@ -1,6 +1,6 @@
 package com.example.apigateway;
 
-import com.example.JwtUtil;
+import com.example.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

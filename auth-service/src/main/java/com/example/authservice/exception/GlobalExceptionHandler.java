@@ -1,7 +1,7 @@
 package com.example.authservice.exception;
 
-import com.example.CommonException;
-import com.example.ErrorResponse;
+import com.example.exception.CommonException;
+import com.example.dto.ErrorResponse;
 import com.example.authservice.entity.ErrorLog;
 import com.example.authservice.repository.ErrorLogRepository;
 import jakarta.servlet.http.HttpServletRequest;
