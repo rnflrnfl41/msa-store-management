@@ -1,19 +1,17 @@
 package com.example.authservice.service;
 
+import com.example.JwtUtil;
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
 import com.example.authservice.entity.UserInfo;
-import com.example.authservice.exception.CommonException;
-import com.example.authservice.exception.CommonExceptionCode;
+import com.example.CommonException;
+import com.example.CommonExceptionCode;
 import com.example.authservice.repository.UserInfoRepository;
-import com.example.authservice.util.ApiResponse;
-import com.example.authservice.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +32,12 @@ public class AuthService {
             throw new CommonException(CommonExceptionCode.ID_PASSWORD_FAIL);
         }
 
-        String token = jwtUtil.createToken(userInfo);
+        Map<String, Object> claims = Map.of(
+                "loginId", userInfo.getLoginId(),
+                "name", userInfo.getName()
+        );
 
+        String token = jwtUtil.createToken(String.valueOf(userInfo.getIdx()), claims);
 
         LoginResponse response =
                 LoginResponse.builder()
