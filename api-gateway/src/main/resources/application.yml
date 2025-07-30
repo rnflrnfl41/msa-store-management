@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: customer-service
+          uri: lb://customer-service #Load Balancer 프로토콜 사용, Eureka에 등록된 서비스 이름
+          predicates:
+            - Path=/api/customers/**
+          filters:
+            - StripPrefix=0
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true # 자신을 Eureka에 등록
+    fetch-registry: true # 다른 서비스 정보를 주기적으로 가져옴
+
+
+jwt:
+  token:
+    key: ${JWT_SECRET}
+
+security:
+  permit-all-paths:
+    - /api/auth/**
+    - /swagger-ui/**
+    - /swagger-ui.html
+    - /v3/api-docs/**
+    - /error/**
+    - /ws/**
