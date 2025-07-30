@@ -1,0 +1,37 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation 'org.springframework:spring-web'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+
+    //Jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+}
+
+// JAR 파일 생성 활성화
+jar {
+    enabled = true
+    archiveClassifier = '' // 기본 JAR 파일 생성
+}
+
+// Spring Boot의 fat jar 생성 비활성화 (라이브러리용)
+bootJar {
+    enabled = false
+}
