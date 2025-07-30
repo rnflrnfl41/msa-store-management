@@ -49,8 +49,7 @@ pids
 *.pid
 *.seed
 *.pid.lock
-
-*.env
+.env*
 
 # Optional: if you want to keep some IntelliJ settings for team sharing
 # Uncomment the lines below and remove .idea/ from above
