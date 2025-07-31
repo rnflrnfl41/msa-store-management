@@ -1,5 +1,7 @@
 package com.example.util;
 
+import com.example.exception.CommonException;
+import com.example.exception.CommonExceptionCode;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,13 +32,14 @@ public class JwtUtil {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public CommonException validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(decodedSecretKey).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.warn("Invalid JWT Token", e);
-            return false;
+            Jwts.parser().setSigningKey(decodedSecretKey).parseClaimsJws(token);
+            return null;
+        } catch (ExpiredJwtException e) {
+            return new CommonException(CommonExceptionCode.TOKEN_EXPIRED);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            return new CommonException(CommonExceptionCode.INVALID_TOKEN);
         }
     }
 

@@ -1,5 +1,7 @@
 package com.example.apigateway;
 
+import com.example.exception.CommonException;
+import com.example.exception.CommonExceptionCode;
 import com.example.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 @Component
 @Slf4j
@@ -47,14 +50,15 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         // 2. 토큰 추출
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return onError(response, "Missing or invalid Authorization header", HttpStatus.UNAUTHORIZED);
+            return onError(response, new CommonException(CommonExceptionCode.MISSING_TOKEN));
         }
 
         String token = authHeader.substring(7);
 
         // 3. 토큰 검증
-        if (!jwtUtil.validateToken(token)) {
-            return onError(response, "Invalid or expired token", HttpStatus.UNAUTHORIZED);
+        CommonException error = jwtUtil.validateToken(token);
+        if (error != null) {
+            return onError(response, error);
         }
 
         // 4. 사용자 정보 추출
@@ -68,6 +72,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .header("X-User-Idx", userIdx)
                 .header("X-User-LoginId", loginId)
                 .header("X-User-Name", name)
+                .header("X-Gateway-Token", securityProperties.getInternalToken())
                 .build();
 
         return chain.filter(exchange.mutate().request(modifiedRequest).build());
@@ -78,10 +83,16 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .anyMatch(p -> new AntPathMatcher().match(p, path));
     }
 
-    private Mono<Void> onError(ServerHttpResponse response, String message, HttpStatus status) {
-        response.setStatusCode(status);
+    private Mono<Void> onError(ServerHttpResponse response, CommonException ex) {
+        response.setStatusCode(ex.getStatus());
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        String body = "{\"status\":" + status.value() + ",\"message\":\"" + message + "\"}";
+        String body = String.format(
+                "{\"message\": \"%s\", \"code\": \"%s\", \"status\": %d, \"timestamp\": \"%s\"}",
+                ex.getMessage(),
+                ex.getCode().name(),
+                ex.getStatus().value(),
+                LocalDateTime.now()
+        );
         DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Mono.just(buffer));
     }
