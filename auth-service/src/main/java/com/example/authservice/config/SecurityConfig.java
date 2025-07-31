@@ -1,0 +1,36 @@
+package com.example.authservice.config;
+
+import com.example.authservice.config.props.SecurityProperties;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final SecurityProperties securityProperties;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(cors -> {
+                })
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+                        .anyRequest().access((authentication, context) -> {
+                            String token = context.getRequest().getHeader("X-Gateway-Token");
+                            return new AuthorizationDecision(securityProperties.getInternalToken().equals(token));
+                        })
+                )
+                .build();
+
+    }
+}

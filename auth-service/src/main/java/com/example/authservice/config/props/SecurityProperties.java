@@ -1,4 +1,4 @@
-package com.example.apigateway;
+package com.example.authservice.config.props;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,6 +10,5 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "security")
 public class SecurityProperties {
-    private List<String> permitAllPaths;
     private String internalToken;
 }

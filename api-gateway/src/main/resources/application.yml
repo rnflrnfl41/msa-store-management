@@ -40,3 +40,4 @@ security:
     - /v3/api-docs/**
     - /error/**
     - /ws/**
+  internal-token: ${INTERNAL_TOKEN}
