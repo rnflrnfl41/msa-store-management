@@ -1,4 +1,4 @@
-package com.example.apigateway;
+package com.example.apigateway.jwt;
 
 import com.example.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;

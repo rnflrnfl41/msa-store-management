@@ -1,4 +1,4 @@
-package com.example.apigateway;
+package com.example.apigateway.jwt.props;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
