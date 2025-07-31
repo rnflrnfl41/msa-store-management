@@ -1,5 +1,6 @@
 package com.example.authservice.service;
 
+import com.example.authservice.dto.SignupDto;
 import com.example.util.JwtUtil;
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
@@ -8,6 +9,7 @@ import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.authservice.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ public class AuthService {
     private final UserInfoRepository userInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final ModelMapper modelMapper;
 
     public LoginResponse login(LoginRequest loginRequest) {
         String loginId = loginRequest.getLoginId();
@@ -50,8 +53,14 @@ public class AuthService {
         return response;
     }
 
-    public void signup(UserInfo userInfo) {
-        userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+    public void signup(SignupDto signupDto) {
+
+        userInfoRepository.findByLoginId(signupDto.getLoginId()).ifPresent(user -> {
+            throw new CommonException(CommonExceptionCode.DUPLICATE_LOGIN_ID);
+        });
+
+        signupDto.setPassword(passwordEncoder.encode(signupDto.getPassword()));
+        UserInfo userInfo = modelMapper.map(signupDto,UserInfo.class);
         userInfoRepository.save(userInfo);
     }
 }
