@@ -12,6 +12,11 @@ public enum CommonExceptionCode {
     MISSING_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료 되었습니다."),
 
+    SAVED_REFRESH_TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "저장된 refresh 토큰이 없습니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 refresh 토큰 입니다."),
+    MISSING_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "refresh 토큰이 없습니다."),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "refresh 토큰이 만료 되었습니다."),
+
 
     DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "이미 사용중인 아이디 입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),

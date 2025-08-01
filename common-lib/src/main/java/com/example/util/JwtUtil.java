@@ -5,9 +5,13 @@ import com.example.exception.CommonExceptionCode;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 public class JwtUtil {
@@ -49,6 +53,32 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public UUID getSubjects(String token) {
+        return UUID.fromString(this.getClaims(token).getSubject());
+    }
+
+    public String createRefreshToken(String subject) {
+        Instant now = Instant.now();
+        Instant expiry = now.plus(Duration.ofDays(7));
+
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiry))
+                .signWith(SignatureAlgorithm.HS256, decodedSecretKey)
+                .compact();
+    }
+
+    public Instant getRefreshTokenExpiration(String token) {
+        Date expiration = Jwts.parser()
+                .setSigningKey(decodedSecretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+
+        return expiration.toInstant();
     }
 
 }

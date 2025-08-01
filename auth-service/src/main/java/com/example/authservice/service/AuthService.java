@@ -1,53 +1,72 @@
 package com.example.authservice.service;
 
 import com.example.authservice.dto.SignupDto;
+import com.example.authservice.dto.TokenRefreshRequest;
+import com.example.authservice.entity.RefreshToken;
+import com.example.authservice.entity.User;
+import com.example.authservice.repository.RefreshTokenRepository;
+import com.example.authservice.repository.UserRepository;
 import com.example.util.JwtUtil;
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
-import com.example.authservice.entity.UserInfo;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
-import com.example.authservice.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserInfoRepository userInfoRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final ModelMapper modelMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public LoginResponse login(LoginRequest loginRequest) {
         String loginId = loginRequest.getLoginId();
         String password = loginRequest.getPassword();
 
-        UserInfo userInfo = userInfoRepository.findByLoginId(loginId)
+        User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(password, userInfo.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(CommonExceptionCode.ID_PASSWORD_FAIL);
         }
 
         Map<String, Object> claims = Map.of(
-                "loginId", userInfo.getLoginId(),
-                "name", userInfo.getName()
+                "storeId", user.getStoreId(),
+                "loginId", user.getLoginId(),
+                "name", user.getName()
         );
 
-        String token = jwtUtil.createToken(String.valueOf(userInfo.getIdx()), claims);
+        String token = jwtUtil.createToken(String.valueOf(user.getId()), claims);
+        String refreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
+
+        refreshTokenRepository.deleteByUser_Id(user.getId());
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .user(user)
+                        .token(refreshToken)
+                        .expiredAt(jwtUtil.getRefreshTokenExpiration(refreshToken))
+                        .build());
 
         LoginResponse response =
                 LoginResponse.builder()
-                        .userIdx(userInfo.getIdx())
-                        .userId(loginId)
-                        .userName(userInfo.getName())
+                        .userId(user.getId())
+                        .loginId(loginId)
+                        .storeId(user.getStoreId())
+                        .userName(user.getName())
                         .token(token)
+                        .refreshToken(refreshToken)
                         .build();
 
         return response;
@@ -55,12 +74,56 @@ public class AuthService {
 
     public void signup(SignupDto signupDto) {
 
-        userInfoRepository.findByLoginId(signupDto.getLoginId()).ifPresent(user -> {
+        userRepository.findByLoginId(signupDto.getLoginId()).ifPresent(user -> {
             throw new CommonException(CommonExceptionCode.DUPLICATE_LOGIN_ID);
         });
 
         signupDto.setPassword(passwordEncoder.encode(signupDto.getPassword()));
-        UserInfo userInfo = modelMapper.map(signupDto,UserInfo.class);
-        userInfoRepository.save(userInfo);
+        User user = modelMapper.map(signupDto,User.class);
+        userRepository.save(user);
+    }
+
+    public LoginResponse refreshToken(TokenRefreshRequest request) {
+
+        String refreshToken = request.getRefreshToken();
+
+        if(refreshToken == null || refreshToken.isEmpty()){
+            throw new CommonException(CommonExceptionCode.MISSING_REFRESH_TOKEN);
+        }
+
+        UUID userId = jwtUtil.getSubjects(refreshToken);
+
+        RefreshToken storedToken = refreshTokenRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.SAVED_REFRESH_TOKEN_NOT_EXIST));
+
+        if (!storedToken.getToken().equals(refreshToken)) {
+            throw new CommonException(CommonExceptionCode.INVALID_REFRESH_TOKEN);
+        }
+
+        if (storedToken.getExpiredAt().isBefore(Instant.now())) {
+            throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+
+        Map<String, Object> newClaims = Map.of(
+                "loginId", user.getLoginId(),
+                "name", user.getName()
+        );
+
+        String newAccessToken = jwtUtil.createToken(String.valueOf(userId), newClaims);
+
+        LoginResponse response = LoginResponse.builder()
+                .userId(userId)
+                .loginId(user.getLoginId())
+                .storeId(user.getStoreId())
+                .userName(user.getName())
+                .token(newAccessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        return response;
+
     }
 }

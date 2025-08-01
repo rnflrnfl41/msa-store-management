@@ -3,23 +3,23 @@ package com.example.authservice.controller;
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
 import com.example.authservice.dto.SignupDto;
-import com.example.authservice.entity.UserInfo;
+import com.example.authservice.dto.TokenRefreshRequest;
+import com.example.authservice.entity.RefreshToken;
+import com.example.authservice.entity.User;
+import com.example.authservice.repository.RefreshTokenRepository;
 import com.example.authservice.service.AuthService;
 import com.example.dto.ApiResponse;
 import com.example.exception.CommonException;
-import com.example.exception.CommonExceptionCode;
 import com.example.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     private final AuthService authService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostMapping(value = "/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
@@ -39,6 +40,12 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody SignupDto signupDto) {
         authService.signup(signupDto);
         return ResponseUtil.created("회원가입 완료");
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody TokenRefreshRequest request) {
+        LoginResponse response = authService.refreshToken(request);
+        return ResponseUtil.success(response);
     }
 
 }
