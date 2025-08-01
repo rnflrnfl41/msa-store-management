@@ -13,10 +13,18 @@ spring:
             - Path=/api/customers/**
           filters:
             - StripPrefix=0
+
         - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+
+        - id: store-service
+          uri: lb://store-service
+          predicates:
+            - Path=/api/store/**
           filters:
             - StripPrefix=0
 
