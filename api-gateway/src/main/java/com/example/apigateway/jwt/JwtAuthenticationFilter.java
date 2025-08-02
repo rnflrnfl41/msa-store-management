@@ -66,12 +66,16 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String userIdx = claims.getSubject();
         String loginId = (String) claims.get("loginId");
         String name = (String) claims.get("name");
+        String storeId = (String) claims.get("storeId");
+        String role = (String) claims.get("role");
 
         // 5. 요청 헤더에 사용자 정보 추가
         ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                 .header("X-User-Idx", userIdx)
                 .header("X-User-LoginId", loginId)
                 .header("X-User-Name", name)
+                .header("X-User-StoreId", storeId)
+                .header("X-User-Role", role)
                 .header("X-Gateway-Token", securityProperties.getInternalToken())
                 .build();
 

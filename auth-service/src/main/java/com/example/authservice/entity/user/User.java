@@ -1,4 +1,4 @@
-package com.example.authservice.entity;
+package com.example.authservice.entity.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +38,10 @@ public class User {
     @Size(max = 50)
     @Column(name = "name", length = 50)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Role role;
 
     @Column(name = "created_at")
     private Instant createdAt;

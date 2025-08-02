@@ -4,12 +4,9 @@ import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
 import com.example.authservice.dto.SignupDto;
 import com.example.authservice.dto.TokenRefreshRequest;
-import com.example.authservice.entity.RefreshToken;
-import com.example.authservice.entity.User;
 import com.example.authservice.repository.RefreshTokenRepository;
 import com.example.authservice.service.AuthService;
 import com.example.dto.ApiResponse;
-import com.example.exception.CommonException;
 import com.example.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final RefreshTokenRepository refreshTokenRepository;
 
     @PostMapping(value = "/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(

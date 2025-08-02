@@ -1,14 +1,11 @@
 package com.example.authservice.entity;
 
+import com.example.authservice.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter

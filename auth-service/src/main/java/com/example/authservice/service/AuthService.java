@@ -3,7 +3,7 @@ package com.example.authservice.service;
 import com.example.authservice.dto.SignupDto;
 import com.example.authservice.dto.TokenRefreshRequest;
 import com.example.authservice.entity.RefreshToken;
-import com.example.authservice.entity.User;
+import com.example.authservice.entity.user.User;
 import com.example.authservice.repository.RefreshTokenRepository;
 import com.example.authservice.repository.UserRepository;
 import com.example.util.JwtUtil;
@@ -13,7 +13,6 @@ import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +44,8 @@ public class AuthService {
         Map<String, Object> claims = Map.of(
                 "storeId", user.getStoreId(),
                 "loginId", user.getLoginId(),
-                "name", user.getName()
+                "name", user.getName(),
+                "role", user.getRole()
         );
 
         String token = jwtUtil.createToken(String.valueOf(user.getId()), claims);
@@ -108,8 +108,10 @@ public class AuthService {
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
 
         Map<String, Object> newClaims = Map.of(
+                "storeId", user.getStoreId(),
                 "loginId", user.getLoginId(),
-                "name", user.getName()
+                "name", user.getName(),
+                "role", user.getRole()
         );
 
         String newAccessToken = jwtUtil.createToken(String.valueOf(userId), newClaims);
