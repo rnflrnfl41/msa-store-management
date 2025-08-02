@@ -1,20 +1,22 @@
 package com.example.authservice.controller;
 
+import com.example.authservice.entity.user.Role;
 import com.example.authservice.dto.LoginRequest;
 import com.example.authservice.dto.LoginResponse;
 import com.example.authservice.dto.SignupDto;
 import com.example.authservice.dto.TokenRefreshRequest;
-import com.example.authservice.repository.RefreshTokenRepository;
 import com.example.authservice.service.AuthService;
 import com.example.dto.ApiResponse;
+import com.example.exception.CommonException;
+import com.example.exception.CommonExceptionCode;
 import com.example.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
+import static com.example.Constant.RoleConstants.ROLE_ADMIN;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,7 +33,14 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody SignupDto signupDto) {
+    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody SignupDto signupDto,
+                                                      @RequestHeader(X_USER_ROLE) String role) {
+
+        //관리자 계정만 접근 가능
+        if (!role.equals(ROLE_ADMIN)) {
+            throw new CommonException(CommonExceptionCode.NO_PERMISSIONS);
+        }
+
         authService.signup(signupDto);
         return ResponseUtil.created("회원가입 완료");
     }

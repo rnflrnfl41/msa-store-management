@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
+import static com.example.Constant.HttpHeaderConstants.*;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -71,12 +73,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         // 5. 요청 헤더에 사용자 정보 추가
         ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
-                .header("X-User-Idx", userIdx)
-                .header("X-User-LoginId", loginId)
-                .header("X-User-Name", name)
-                .header("X-User-StoreId", storeId)
-                .header("X-User-Role", role)
-                .header("X-Gateway-Token", securityProperties.getInternalToken())
+                .header(X_USER_IDX, userIdx)
+                .header(X_USER_LOGIN_ID, loginId)
+                .header(X_USER_NAME, name)
+                .header(X_USER_STORE_ID, storeId)
+                .header(X_USER_ROLE, role)
+                .header(X_GATEWAY_TOKEN, securityProperties.getInternalToken())
                 .build();
 
         return chain.filter(exchange.mutate().request(modifiedRequest).build());
