@@ -35,5 +35,5 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	implementation 'org.postgresql:postgresql:42.7.2'
+	implementation 'mysql:mysql-connector-java:8.0.33'
 }
