@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @Entity
@@ -48,5 +50,14 @@ public class ErrorLog {
     @Lob
     @Column(name = "stack_trace", columnDefinition = "TEXT")
     private String stackTrace;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        this.createdAt = now;
+    }
 
 }
