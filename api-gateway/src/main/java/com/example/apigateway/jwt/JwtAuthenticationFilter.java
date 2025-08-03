@@ -39,31 +39,34 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-
-        // 1. 허용 경로는 JWT 검사 생략
         String path = request.getURI().getPath();
+        long start = System.currentTimeMillis();
 
-        log.info("Request path: {}", path); // 로그 추가
+        log.info("[REQUEST] Method: {}, Path: {}, Query: {}",
+                request.getMethod(), path, request.getQueryParams());
 
+        // 1. 허용된 경로는 필터 패스
         if (isPermitPath(path)) {
-            return chain.filter(exchange);
+            return chain.filter(exchange)
+                    .doOnSuccess(aVoid -> logElapsed(path, start, true))
+                    .doOnError(error -> logElapsed(path, start, false, error));
         }
 
-        // 2. 토큰 추출
+        // 2. Authorization 헤더에서 JWT 추출
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return onError(response, new CommonException(CommonExceptionCode.MISSING_TOKEN));
+            return onError(response, CommonExceptionCode.MISSING_TOKEN, start, path);
         }
 
         String token = authHeader.substring(7);
 
-        // 3. 토큰 검증
+        // 3. 토큰 유효성 검사
         CommonException error = jwtUtil.validateToken(token);
         if (error != null) {
-            return onError(response, error);
+            return onError(response, error.getCode(), start, path);
         }
 
-        // 4. 사용자 정보 추출
+        // 4. 토큰에서 사용자 정보 추출
         Claims claims = jwtUtil.getClaims(token);
         String userIdx = claims.getSubject();
         String loginId = (String) claims.get("loginId");
@@ -71,8 +74,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String storeId = (String) claims.get("storeId");
         String role = (String) claims.get("role");
 
-        // 5. 요청 헤더에 사용자 정보 추가
-        ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+        // 5. 사용자 정보를 헤더에 추가
+        ServerHttpRequest modifiedRequest = request.mutate()
                 .header(X_USER_IDX, userIdx)
                 .header(X_USER_LOGIN_ID, loginId)
                 .header(X_USER_NAME, name)
@@ -81,7 +84,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .header(X_GATEWAY_TOKEN, securityProperties.getInternalToken())
                 .build();
 
-        return chain.filter(exchange.mutate().request(modifiedRequest).build());
+        ServerWebExchange modifiedExchange = exchange.mutate().request(modifiedRequest).build();
+
+        // 6. 필터 체인 실행 및 응답 로깅
+        return chain.filter(modifiedExchange)
+                .doOnSuccess(aVoid -> logElapsed(path, start, true))
+                .doOnError(errorEx -> logElapsed(path, start, false, errorEx));
     }
 
     private boolean isPermitPath(String path) {
@@ -89,23 +97,50 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .anyMatch(p -> new AntPathMatcher().match(p, path));
     }
 
-    private Mono<Void> onError(ServerHttpResponse response, CommonException ex) {
-        response.setStatusCode(ex.getStatus());
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+    private void logElapsed(String path, long startTime, boolean success) {
+        long elapsed = System.currentTimeMillis() - startTime;
+        if (success) {
+            log.info("[RESPONSE SUCCESS] Path: {}, Elapsed: {}ms", path, elapsed);
+        } else {
+            log.warn("[RESPONSE FAILED] Path: {}, Elapsed: {}ms", path, elapsed);
+        }
+    }
+
+    private void logElapsed(String path, long startTime, boolean success, Throwable error) {
+        long elapsed = System.currentTimeMillis() - startTime;
+        if (success) {
+            log.info("[RESPONSE SUCCESS] Path: {}, Elapsed: {}ms", path, elapsed);
+        } else {
+            log.error("[RESPONSE ERROR] Path: {}, Error: {}, Elapsed: {}ms", path, error.getMessage(), elapsed);
+        }
+    }
+
+    private Mono<Void> onError(ServerHttpResponse response, CommonExceptionCode code, long start, String path) {
+        log.warn("[AUTH ERROR] Code: {}, Path: {}", code.name(), path);
+        long elapsed = System.currentTimeMillis() - start;
+
+        response.setStatusCode(code.getStatus());
+        response.getHeaders().setContentType(MediaType.valueOf("application/json;charset=UTF-8"));
+        response.getHeaders().add("Cache-Control", "no-store");
+        response.getHeaders().add("Pragma", "no-cache");
+
         String body = String.format(
                 "{\"message\": \"%s\", \"code\": \"%s\", \"status\": %d, \"timestamp\": \"%s\"}",
-                ex.getMessage(),
-                ex.getCode().name(),
-                ex.getStatus().value(),
+                code.getMessage(),
+                code.name(),
+                code.getStatus().value(),
                 LocalDateTime.now()
         );
+
         DataBuffer buffer = response.bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
-        return response.writeWith(Mono.just(buffer));
+        return response.writeWith(Mono.just(buffer))
+                .doOnTerminate(() -> log.error("[RESPONSE ERROR] Path: {}, Status: {}, Elapsed: {}ms", path, code.getStatus(), elapsed));
     }
 
     @Override
     public int getOrder() {
-        return -1; // 우선순위 (낮을수록 먼저 실행)
+        return -1; // 높은 우선순위 (낮을수록 먼저 실행)
     }
 }
+
 
