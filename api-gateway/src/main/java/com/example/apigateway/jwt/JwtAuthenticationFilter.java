@@ -116,7 +116,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private Mono<Void> onError(ServerHttpResponse response, CommonExceptionCode code, long start, String path) {
-        log.warn("[AUTH ERROR] Code: {}, Path: {}", code.name(), path);
         long elapsed = System.currentTimeMillis() - start;
 
         response.setStatusCode(code.getStatus());
