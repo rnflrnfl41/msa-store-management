@@ -7,7 +7,7 @@ include 'customer-service'
 include 'auth-service'
 include 'store-service'
 //include 'visit-service'
-//include 'sales-service'
+include 'sales-service'
 include 'point-service'
 include 'expense-service'
 

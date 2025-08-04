@@ -42,6 +42,13 @@ spring:
           filters:
             - StripPrefix=0
 
+        - id: sales-service
+          uri: lb://sales-service
+          predicates:
+            - Path=/api/sales/**
+          filters:
+            - StripPrefix=0
+
 eureka:
   client:
     serviceUrl:
