@@ -1,0 +1,7 @@
+package com.example.pointservice.repository;
+
+import com.example.pointservice.entity.ErrorLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ErrorLogRepository extends JpaRepository <ErrorLog, Integer> {
+}

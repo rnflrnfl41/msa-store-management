@@ -35,6 +35,13 @@ spring:
           filters:
             - StripPrefix=0
 
+        - id: point-service
+          uri: lb://point-service
+          predicates:
+            - Path=/api/point/**
+          filters:
+            - StripPrefix=0
+
 eureka:
   client:
     serviceUrl:
