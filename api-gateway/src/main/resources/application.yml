@@ -28,6 +28,13 @@ spring:
           filters:
             - StripPrefix=0
 
+        - id: expense-service
+          uri: lb://expense-service
+          predicates:
+            - Path=/api/expense/**
+          filters:
+            - StripPrefix=0
+
 eureka:
   client:
     serviceUrl:
