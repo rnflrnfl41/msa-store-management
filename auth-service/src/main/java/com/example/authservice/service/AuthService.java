@@ -128,4 +128,10 @@ public class AuthService {
         return response;
 
     }
+
+    public void deleteUser(UUID userId) {
+
+        userRepository.deleteById(userId);
+
+    }
 }
