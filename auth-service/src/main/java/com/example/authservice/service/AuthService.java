@@ -1,14 +1,12 @@
 package com.example.authservice.service;
 
-import com.example.authservice.dto.SignupDto;
-import com.example.authservice.dto.TokenRefreshRequest;
+import com.example.authservice.dto.*;
 import com.example.authservice.entity.RefreshToken;
+import com.example.authservice.entity.user.Role;
 import com.example.authservice.entity.user.User;
 import com.example.authservice.repository.RefreshTokenRepository;
 import com.example.authservice.repository.UserRepository;
 import com.example.util.JwtUtil;
-import com.example.authservice.dto.LoginRequest;
-import com.example.authservice.dto.LoginResponse;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -132,6 +131,31 @@ public class AuthService {
     public void deleteUser(UUID userId) {
 
         userRepository.deleteById(userId);
+
+    }
+
+    public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
+
+        List<User> userList = userRepository.findByStoreId(storeId);
+
+        return userList.stream()
+                .map(user -> modelMapper.map(user,UserDto.class))
+                .toList();
+
+    }
+
+    public void updateUser(UUID userId, UserDto userDto) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+
+        user.setLoginId(userDto.getLoginId());
+        user.setName(userDto.getName());
+        user.setPassword(encodedPassword);
+
+        userRepository.save(user);
 
     }
 }

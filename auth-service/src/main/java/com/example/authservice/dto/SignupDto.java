@@ -22,4 +22,7 @@ public class SignupDto {
     @NotBlank(message = "이름")
     private String name;
 
+    @NotBlank(message = "Role")
+    private String role;
+
 }

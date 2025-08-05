@@ -1,10 +1,7 @@
 package com.example.authservice.controller;
 
+import com.example.authservice.dto.*;
 import com.example.authservice.entity.user.Role;
-import com.example.authservice.dto.LoginRequest;
-import com.example.authservice.dto.LoginResponse;
-import com.example.authservice.dto.SignupDto;
-import com.example.authservice.dto.TokenRefreshRequest;
 import com.example.authservice.service.AuthService;
 import com.example.dto.ApiResponse;
 import com.example.exception.CommonException;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
@@ -52,13 +50,31 @@ public class AuthController {
         return ResponseUtil.success(response);
     }
 
+    @GetMapping("{storeId}")
+    public ResponseEntity<ApiResponse<List<UserDto>>> getAllUserInfoByStoreId(@PathVariable UUID storeId,
+                                                                              @RequestHeader(X_USER_ROLE) String role) {
+        AuthUtil.validateAdmin(role);
+        return ResponseUtil.success(authService.getAllUserInfoByStoreId(storeId));
+    }
+
     @DeleteMapping("/{userId}")
     public ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable UUID userId,
-                                           @RequestHeader(X_USER_ROLE) String role){
+                                                          @RequestHeader(X_USER_ROLE) String role) {
 
         AuthUtil.validateAdmin(role);
         authService.deleteUser(userId);
         return ResponseUtil.success("유저 삭제 완료");
+
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<ApiResponse<String>> updateUser(@PathVariable UUID userId,
+                                                          @RequestBody UserDto userDto,
+                                                          @RequestHeader(X_USER_ROLE) String role) {
+
+        AuthUtil.validateAdmin(role);
+        authService.updateUser(userId, userDto);
+        return ResponseUtil.success("유저 수정 완료");
 
     }
 
