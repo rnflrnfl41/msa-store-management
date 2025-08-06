@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
 
@@ -40,6 +41,17 @@ public class StoreController {
         AuthUtil.validateAdmin(role);
 
         return ResponseUtil.success(storeService.getAllStore());
+    }
+
+    @GetMapping("/{publicId}")
+    public ResponseEntity<ApiResponse<StoreDto>> getAllStore(
+            @PathVariable UUID publicId,
+            @RequestHeader(X_USER_ROLE) String role) {
+
+        //관리자 계정만 접근 가능
+        AuthUtil.validateAdmin(role);
+
+        return ResponseUtil.success(storeService.getStore(publicId));
     }
 
 }
