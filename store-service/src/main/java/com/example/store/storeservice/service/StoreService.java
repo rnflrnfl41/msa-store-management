@@ -45,4 +45,17 @@ public class StoreService {
         return modelMapper.map(store,StoreDto.class);
 
     }
+
+    public void updateStore(UUID publicId, StoreDto storeDto) {
+
+        Store store = storeRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.STORE_NOT_FOUND));
+
+        store.setName(storeDto.getName());
+        store.setOwnerName(storeDto.getOwnerName());
+        store.setPhone(storeDto.getPhone());
+
+        storeRepository.save(store);
+
+    }
 }

@@ -54,4 +54,16 @@ public class StoreController {
         return ResponseUtil.success(storeService.getStore(publicId));
     }
 
+    @PatchMapping("/{publicId}")
+    public ResponseEntity<ApiResponse<String>> updateStore(@PathVariable UUID publicId,
+                                                           @RequestBody StoreDto storeDto,
+                                                           @RequestHeader(X_USER_ROLE) String role) {
+
+        AuthUtil.validateAdmin(role);
+        storeService.updateStore(publicId, storeDto);
+
+        return ResponseUtil.success("점포정보 수정 완료");
+
+    }
+
 }
