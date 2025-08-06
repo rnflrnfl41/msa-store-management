@@ -2,15 +2,18 @@ package com.example.store.storeservice.controller;
 
 import com.example.dto.ApiResponse;
 import com.example.store.storeservice.dto.StoreCreateRequest;
+import com.example.store.storeservice.dto.StoreDto;
 import com.example.store.storeservice.service.StoreService;
+import com.example.util.AuthUtil;
 import com.example.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
 
 @RestController
 @RequestMapping("/api/store")
@@ -20,9 +23,23 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> createStore(@Valid @RequestBody StoreCreateRequest request) {
+    public ResponseEntity<ApiResponse<String>> createStore(@Valid @RequestBody StoreCreateRequest request,
+                                                           @RequestHeader(X_USER_ROLE) String role) {
+
+        //관리자 계정만 접근 가능
+        AuthUtil.validateAdmin(role);
+
         storeService.createStore(request);
         return ResponseUtil.created("매장 생성 완료");
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<StoreDto>>> getAllStore(@RequestHeader(X_USER_ROLE) String role) {
+
+        //관리자 계정만 접근 가능
+        AuthUtil.validateAdmin(role);
+
+        return ResponseUtil.success(storeService.getAllStore());
     }
 
 }
