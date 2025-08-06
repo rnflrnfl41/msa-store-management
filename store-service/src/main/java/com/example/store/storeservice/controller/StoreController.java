@@ -66,4 +66,15 @@ public class StoreController {
 
     }
 
+    @DeleteMapping("{publicId}")
+    public ResponseEntity<ApiResponse<String>> deleteStore(@PathVariable UUID publicId,
+                                                           @RequestHeader(X_USER_ROLE) String role) {
+
+        AuthUtil.validateAdmin(role);
+        storeService.deleteStore(publicId);
+
+        return ResponseUtil.success("점포 삭제 완료");
+
+    }
+
 }

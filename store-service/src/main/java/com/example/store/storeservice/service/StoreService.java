@@ -39,8 +39,7 @@ public class StoreService {
 
     public StoreDto getStore(UUID publicId) {
 
-        Store store = storeRepository.findByPublicId(publicId)
-                .orElseThrow(() -> new CommonException(CommonExceptionCode.STORE_NOT_FOUND));
+        Store store = GetStoreByPublicId(publicId);
 
         return modelMapper.map(store,StoreDto.class);
 
@@ -48,8 +47,7 @@ public class StoreService {
 
     public void updateStore(UUID publicId, StoreDto storeDto) {
 
-        Store store = storeRepository.findByPublicId(publicId)
-                .orElseThrow(() -> new CommonException(CommonExceptionCode.STORE_NOT_FOUND));
+        Store store = GetStoreByPublicId(publicId);
 
         store.setName(storeDto.getName());
         store.setOwnerName(storeDto.getOwnerName());
@@ -57,5 +55,16 @@ public class StoreService {
 
         storeRepository.save(store);
 
+    }
+
+    public void deleteStore(UUID publicId) {
+
+        storeRepository.deleteByPublicId(publicId);
+
+    }
+
+    private Store GetStoreByPublicId(UUID publicId){
+        return storeRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.STORE_NOT_FOUND));
     }
 }

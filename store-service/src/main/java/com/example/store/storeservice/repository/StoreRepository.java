@@ -10,4 +10,6 @@ public interface StoreRepository extends JpaRepository <Store, Integer> {
 
     Optional<Store> findByPublicId(UUID publicId);
 
+    void deleteByPublicId(UUID publicId);
+
 }
