@@ -8,8 +8,12 @@ import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.util.AuthUtil;
 import com.example.util.ResponseUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +32,15 @@ public class AuthController {
 
     @PostMapping(value = "/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
-            @RequestBody LoginRequest loginRequest) {
-        LoginResponse response = authService.login(loginRequest);
-        return ResponseUtil.success(response);
+            @RequestBody LoginRequest loginRequest,
+            HttpServletResponse httpResponse) {
+
+        LoginResponse loginResponse = authService.login(loginRequest);
+
+        ResponseCookie refreshCookie = authService.setRefreshToken(loginRequest);
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return ResponseUtil.success(loginResponse);
     }
 
     @PostMapping("/signup")
@@ -45,7 +55,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(HttpServletRequest request) {
         LoginResponse response = authService.refreshToken(request);
         return ResponseUtil.success(response);
     }
