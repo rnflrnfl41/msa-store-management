@@ -73,15 +73,27 @@ public class AuthService {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
 
+        // 디버깅 코드 추가
+        System.out.println("User ID: " + user.getId());
+        System.out.println("User ID 타입: " + user.getId().getClass().getName());
+        System.out.println("User ID toString: " + user.getId().toString());
+
+        boolean exists = userRepository.existsById(user.getId());
+        System.out.println("DB에 사용자 존재 여부: " + exists);
+
         String refreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
 
         refreshTokenRepository.deleteByUser_Id(user.getId());
-        refreshTokenRepository.save(
-                RefreshToken.builder()
-                        .user(user)
-                        .token(refreshToken)
-                        .expiredAt(jwtUtil.getRefreshTokenExpiration(refreshToken))
-                        .build());
+
+        RefreshToken tokenEntity = RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiredAt(jwtUtil.getRefreshTokenExpiration(refreshToken))
+                .build();
+
+        System.out.println("저장하려는 RefreshToken의 User ID: " + tokenEntity.getUser().getId());
+
+        refreshTokenRepository.save(tokenEntity);
 
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)

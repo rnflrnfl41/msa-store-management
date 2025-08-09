@@ -36,12 +36,10 @@ public class RefreshToken {
     @Column(name = "expired_at", nullable = false)
     private Instant expiredAt;
 
-    @NotNull
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @NotNull
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
