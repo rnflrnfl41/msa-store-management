@@ -6,8 +6,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 
+import java.sql.Types;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -20,10 +22,12 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
+    @JdbcTypeCode(Types.CHAR)
     private UUID id;
 
     @NotNull
     @Column(name = "store_id", nullable = false)
+    @JdbcTypeCode(Types.CHAR)
     private UUID storeId;
 
     @Size(max = 50)

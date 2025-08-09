@@ -27,7 +27,4 @@ public class LoginResponse {
     @Schema(description = "토큰", example = "xNzUwMjI4MjczLCJleHAiOjE3NTAyNTcwNzN9.rPsO9gPA71A7FryZAafKBokTlxae85p_Wlq-CEiCkXo")
     private String token;
 
-    @Schema(description = "새로고침 토큰", example = "eyJhbGciOiJIUzIlxae85p_Wlq-CEiCkXo")
-    private String refreshToken;
-
 }
