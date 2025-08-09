@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
@@ -17,8 +18,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -32,26 +32,21 @@ public class User {
     private String loginId;
 
     @NotNull
-    @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "password", nullable = false, columnDefinition = "TEXT")
     private String password;
 
     @Size(max = 50)
     @Column(name = "name", length = 50)
     private String name;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(length = 10)
+    @Column(name = "role", nullable = false, length = 10)
     private Role role;
 
-    @Column(name = "created_at")
+    @NotNull
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private Instant createdAt;
-
-    // 👉 생성 시 자동으로 세팅
-    @PrePersist
-    protected void onCreate() {
-        Instant now = Instant.now();
-        this.createdAt = now;
-    }
-
 
 }
