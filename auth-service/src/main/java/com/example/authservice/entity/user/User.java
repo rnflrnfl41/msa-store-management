@@ -22,7 +22,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
-    @JdbcTypeCode(Types.CHAR)
+    @JdbcTypeCode(Types.CHAR) //JPA가 UUID를 바이트 배열이 아닌, 36자리의 문자열로 처리
     private UUID id;
 
     @NotNull
@@ -48,7 +48,6 @@ public class User {
     @Column(name = "role", nullable = false, length = 10)
     private Role role;
 
-    @NotNull
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private Instant createdAt;
