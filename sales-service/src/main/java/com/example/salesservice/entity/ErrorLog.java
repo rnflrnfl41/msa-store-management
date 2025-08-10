@@ -3,6 +3,7 @@ package com.example.salesservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.Instant;
@@ -51,13 +52,8 @@ public class ErrorLog {
     @Column(name = "stack_trace", columnDefinition = "TEXT")
     private String stackTrace;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private Instant createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        Instant now = Instant.now();
-        this.createdAt = now;
-    }
 
 }

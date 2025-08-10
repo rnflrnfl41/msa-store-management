@@ -1,22 +1,27 @@
 package com.example.authservice.service;
 
-import com.example.authservice.dto.SignupDto;
-import com.example.authservice.dto.TokenRefreshRequest;
+import com.example.authservice.dto.*;
 import com.example.authservice.entity.RefreshToken;
+import com.example.authservice.entity.user.Role;
 import com.example.authservice.entity.user.User;
 import com.example.authservice.repository.RefreshTokenRepository;
 import com.example.authservice.repository.UserRepository;
 import com.example.util.JwtUtil;
-import com.example.authservice.dto.LoginRequest;
-import com.example.authservice.dto.LoginResponse;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,15 +54,6 @@ public class AuthService {
         );
 
         String token = jwtUtil.createToken(String.valueOf(user.getId()), claims);
-        String refreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
-
-        refreshTokenRepository.deleteByUser_Id(user.getId());
-        refreshTokenRepository.save(
-                RefreshToken.builder()
-                        .user(user)
-                        .token(refreshToken)
-                        .expiredAt(jwtUtil.getRefreshTokenExpiration(refreshToken))
-                        .build());
 
         LoginResponse response =
                 LoginResponse.builder()
@@ -66,10 +62,39 @@ public class AuthService {
                         .storeId(user.getStoreId())
                         .userName(user.getName())
                         .token(token)
-                        .refreshToken(refreshToken)
                         .build();
 
         return response;
+    }
+
+    @Transactional
+    public ResponseCookie setRefreshToken(LoginRequest loginRequest){
+
+        String loginId = loginRequest.getLoginId();
+
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+
+        String refreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
+
+        refreshTokenRepository.deleteByUser_Id(user.getId());
+
+        RefreshToken tokenEntity = RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiredAt(jwtUtil.getRefreshTokenExpiration(refreshToken))
+                .build();
+
+        refreshTokenRepository.save(tokenEntity);
+
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false) // HTTPS 환경에서만 적용 (일단 개발용으로 false)
+                .sameSite("Strict")
+                .path("/") // 경로 전체에서 사용
+                .maxAge(Duration.ofDays(7)) // 유효기간 설정
+                .build();
+
     }
 
     public void signup(SignupDto signupDto) {
@@ -83,29 +108,26 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public LoginResponse refreshToken(TokenRefreshRequest request) {
+    public LoginResponse refreshToken(HttpServletRequest request) {
 
-        String refreshToken = request.getRefreshToken();
+        String refreshToken = Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals("refreshToken"))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
 
         if(refreshToken == null || refreshToken.isEmpty()){
             throw new CommonException(CommonExceptionCode.MISSING_REFRESH_TOKEN);
         }
 
-        UUID userId = jwtUtil.getSubjects(refreshToken);
-
-        RefreshToken storedToken = refreshTokenRepository.findByUser_Id(userId)
+        RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.SAVED_REFRESH_TOKEN_NOT_EXIST));
 
-        if (!storedToken.getToken().equals(refreshToken)) {
-            throw new CommonException(CommonExceptionCode.INVALID_REFRESH_TOKEN);
-        }
+        User user = storedToken.getUser();
 
         if (storedToken.getExpiredAt().isBefore(Instant.now())) {
             throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
 
         Map<String, Object> newClaims = Map.of(
                 "storeId", user.getStoreId(),
@@ -114,18 +136,50 @@ public class AuthService {
                 "role", user.getRole()
         );
 
-        String newAccessToken = jwtUtil.createToken(String.valueOf(userId), newClaims);
+        String newAccessToken = jwtUtil.createToken(String.valueOf(user.getId()), newClaims);
+
+
 
         LoginResponse response = LoginResponse.builder()
-                .userId(userId)
+                .userId(user.getId())
                 .loginId(user.getLoginId())
                 .storeId(user.getStoreId())
                 .userName(user.getName())
                 .token(newAccessToken)
-                .refreshToken(refreshToken)
                 .build();
 
         return response;
+
+    }
+
+    public void deleteUser(UUID userId) {
+
+        userRepository.deleteById(userId);
+
+    }
+
+    public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
+
+        List<User> userList = userRepository.findByStoreId(storeId);
+
+        return userList.stream()
+                .map(user -> modelMapper.map(user,UserDto.class))
+                .toList();
+
+    }
+
+    public void updateUser(UUID userId, UserDto userDto) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+
+        user.setLoginId(userDto.getLoginId());
+        user.setName(userDto.getName());
+        user.setPassword(encodedPassword);
+
+        userRepository.save(user);
 
     }
 }
