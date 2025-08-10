@@ -26,6 +26,7 @@ public enum CommonExceptionCode {
 
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND,"해당하는 점포가 없습니다."),
 
+    CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "고객을 찾을 수 없습니다."),
 
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "파라미터가 올바르지않습니다.");
 
