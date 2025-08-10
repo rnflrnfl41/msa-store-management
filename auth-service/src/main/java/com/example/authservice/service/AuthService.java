@@ -108,17 +108,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public LoginResponse refreshToken(HttpServletRequest request) {
-
-        String refreshToken = Arrays.stream(request.getCookies())
-                .filter(c -> c.getName().equals("refreshToken"))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
-
-        if(refreshToken == null || refreshToken.isEmpty()){
-            throw new CommonException(CommonExceptionCode.MISSING_REFRESH_TOKEN);
-        }
+    public LoginResponse refreshToken(String refreshToken) {
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.SAVED_REFRESH_TOKEN_NOT_EXIST));
