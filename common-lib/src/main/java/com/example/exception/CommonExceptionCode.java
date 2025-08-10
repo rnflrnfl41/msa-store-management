@@ -17,6 +17,8 @@ public enum CommonExceptionCode {
     MISSING_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "refresh 토큰이 없습니다."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "refresh 토큰이 만료 되었습니다."),
 
+    NO_COOKIES(HttpStatus.NOT_FOUND,"쿠키를 찾을수 없습니다."),
+
 
     DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "이미 사용중인 아이디 입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),

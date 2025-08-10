@@ -8,6 +8,7 @@ import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.util.AuthUtil;
 import com.example.util.ResponseUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +45,31 @@ public class AuthController {
         return ResponseUtil.success(loginResponse);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request,
+                                                      HttpServletResponse response) {
+
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            throw new CommonException(CommonExceptionCode.NO_COOKIES);
+        }
+
+        Cookie refreshToken = Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals("refreshToken"))
+                .findFirst()
+                .orElse(null);
+
+        // RefreshToken 쿠키 제거
+        refreshToken.setMaxAge(0);
+        refreshToken.setPath("/");
+        refreshToken.setHttpOnly(true);
+        refreshToken.setSecure(false); // HTTPS 환경에서
+        response.addCookie(refreshToken);
+
+        return ResponseUtil.success("로그아웃 완료");
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody SignupDto signupDto,
                                                       @RequestHeader(X_USER_ROLE) String role) {
@@ -56,8 +83,24 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(HttpServletRequest request) {
-        LoginResponse response = authService.refreshToken(request);
-        return ResponseUtil.success(response);
+
+
+        try {
+
+            String refreshToken = Arrays.stream(request.getCookies())
+                    .filter(c -> c.getName().equals("refreshToken"))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+
+            LoginResponse response = authService.refreshToken(refreshToken);
+
+            return ResponseUtil.success(response);
+
+        }catch (Exception e){
+            return null;
+        }
+
     }
 
     @GetMapping("{storeId}")

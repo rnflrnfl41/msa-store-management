@@ -25,7 +25,7 @@ public class SecurityConfig {
                 })
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().access((authentication, context) -> {
                             String token = context.getRequest().getHeader(X_GATEWAY_TOKEN);
                             return new AuthorizationDecision(securityProperties.getInternalToken().equals(token));
