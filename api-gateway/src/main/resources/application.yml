@@ -87,6 +87,8 @@ jwt:
 security:
   permit-all-paths:
     - /api/auth/login
+    - /api/auth/logout
+    - /api/auth/refresh-token
     - /swagger-ui/**
     - /swagger-ui.html
     - /v3/api-docs/**
