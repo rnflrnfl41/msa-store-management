@@ -61,7 +61,7 @@ public class AuthService {
                         .loginId(loginId)
                         .storeId(user.getStoreId())
                         .userName(user.getName())
-                        .token(token)
+                        .accessToken(token)
                         .build();
 
         return response;
@@ -135,7 +135,7 @@ public class AuthService {
                 .loginId(user.getLoginId())
                 .storeId(user.getStoreId())
                 .userName(user.getName())
-                .token(newAccessToken)
+                .accessToken(newAccessToken)
                 .build();
 
         return response;
