@@ -25,6 +25,6 @@ public class LoginResponse {
     private String loginId;
 
     @Schema(description = "토큰", example = "xNzUwMjI4MjczLCJleHAiOjE3NTAyNTcwNzN9.rPsO9gPA71A7FryZAafKBokTlxae85p_Wlq-CEiCkXo")
-    private String token;
+    private String accessToken;
 
 }
