@@ -13,7 +13,6 @@ public class StoreCreateRequest {
     @NotBlank(message = "점주명")
     private String ownerName;
 
-    @NotBlank(message = "매장 번호")
     private String phone;
 
 }

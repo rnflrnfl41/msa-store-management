@@ -6,6 +6,7 @@ import com.example.store.storeservice.dto.StoreCreateRequest;
 import com.example.store.storeservice.dto.StoreDto;
 import com.example.store.storeservice.entity.Store;
 import com.example.store.storeservice.repository.StoreRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,7 @@ public class StoreService {
 
     }
 
+    @Transactional
     public void deleteStore(UUID publicId) {
 
         storeRepository.deleteByPublicId(publicId);
