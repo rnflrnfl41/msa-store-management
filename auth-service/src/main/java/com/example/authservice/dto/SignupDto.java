@@ -10,7 +10,6 @@ import java.util.UUID;
 @Getter
 public class SignupDto {
 
-    @NotBlank(message = "매장 아이디")
     private UUID storeId;
 
     @NotBlank(message = "아이디")
@@ -21,8 +20,5 @@ public class SignupDto {
 
     @NotBlank(message = "이름")
     private String name;
-
-    @NotBlank(message = "Role")
-    private String role;
 
 }
