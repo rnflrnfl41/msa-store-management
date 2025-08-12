@@ -9,21 +9,15 @@ import com.example.authservice.repository.UserRepository;
 import com.example.util.JwtUtil;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +26,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final ModelMapper modelMapper;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public LoginResponse login(LoginRequest loginRequest) {
@@ -41,6 +34,11 @@ public class AuthService {
 
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+
+        //관리자페이지 로그인시 Role 체크
+        if(loginRequest.getAdminLogin() && user.getRole().equals(Role.ROLE_USER)){
+            throw new CommonException(CommonExceptionCode.NO_PERMISSIONS);
+        }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(CommonExceptionCode.ID_PASSWORD_FAIL);
@@ -97,17 +95,6 @@ public class AuthService {
 
     }
 
-    public void signup(SignupDto signupDto) {
-
-        userRepository.findByLoginId(signupDto.getLoginId()).ifPresent(user -> {
-            throw new CommonException(CommonExceptionCode.DUPLICATE_LOGIN_ID);
-        });
-
-        signupDto.setPassword(passwordEncoder.encode(signupDto.getPassword()));
-        User user = modelMapper.map(signupDto,User.class);
-        userRepository.save(user);
-    }
-
     public LoginResponse refreshToken(String refreshToken) {
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
@@ -142,34 +129,4 @@ public class AuthService {
 
     }
 
-    public void deleteUser(UUID userId) {
-
-        userRepository.deleteById(userId);
-
-    }
-
-    public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
-
-        List<User> userList = userRepository.findByStoreId(storeId);
-
-        return userList.stream()
-                .map(user -> modelMapper.map(user,UserDto.class))
-                .toList();
-
-    }
-
-    public void updateUser(UUID userId, UserDto userDto) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
-
-        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
-
-        user.setLoginId(userDto.getLoginId());
-        user.setName(userDto.getName());
-        user.setPassword(encodedPassword);
-
-        userRepository.save(user);
-
-    }
 }
