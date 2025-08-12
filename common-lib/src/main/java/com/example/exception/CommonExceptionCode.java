@@ -24,9 +24,11 @@ public enum CommonExceptionCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
     ID_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "비밀번호가 올바르지않습니다."),
 
-    NO_PERMISSIONS(HttpStatus.UNAUTHORIZED,"해당 URL에 접근 권한이 없습니다."),
+    NO_PERMISSIONS(HttpStatus.UNAUTHORIZED,"접근 권한이 없습니다."),
 
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND,"해당하는 점포가 없습니다."),
+
+    NO_STORE_ID(HttpStatus.NOT_FOUND,"점포 아이디가 없습니다"),
 
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "고객을 찾을 수 없습니다."),
 
