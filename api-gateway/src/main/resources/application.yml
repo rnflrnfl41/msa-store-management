@@ -33,7 +33,7 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/auth/**,/api/user/** #나중에 복잡해지면 분리 예정
           filters:
             - StripPrefix=0
 
