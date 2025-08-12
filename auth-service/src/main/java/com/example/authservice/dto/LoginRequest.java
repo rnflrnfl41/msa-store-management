@@ -11,4 +11,6 @@ public class LoginRequest {
 
     private String password;
 
+    private Boolean adminLogin;
+
 }
