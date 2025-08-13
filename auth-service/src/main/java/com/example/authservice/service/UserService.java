@@ -7,6 +7,7 @@ import com.example.authservice.entity.user.User;
 import com.example.authservice.repository.UserRepository;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,11 +40,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUser(UUID userId) {
-
-        userRepository.deleteById(userId);
-
-    }
 
     public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
 
@@ -54,6 +50,7 @@ public class UserService {
                 .toList();
 
     }
+
 
     public void updateUser(UUID userId, UserDto userDto) {
 
@@ -86,4 +83,16 @@ public class UserService {
     }
 
 
+    @Transactional
+    public void deleteUser(UUID userId) {
+
+        userRepository.deleteById(userId);
+
+    }
+
+
+    @Transactional
+    public void deleteUserByStoreId(UUID storeId) {
+        userRepository.deleteByStoreId(storeId);
+    }
 }

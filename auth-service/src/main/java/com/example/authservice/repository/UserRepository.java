@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository <User, UUID> {
 
     List<User> findByStoreId(UUID storeId);
 
+    void deleteByStoreId(UUID storeId);
+
 }

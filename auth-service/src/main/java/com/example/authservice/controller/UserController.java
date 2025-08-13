@@ -52,6 +52,16 @@ public class UserController {
 
     }
 
+    @DeleteMapping("/store/{storeId}")
+    public ResponseEntity<ApiResponse<String>> deleteUserByStoreId(@PathVariable UUID storeId,
+                                                          @RequestHeader(X_USER_ROLE) String role) {
+
+        AuthUtil.validateAdmin(role);
+        userService.deleteUserByStoreId(storeId);
+        return ResponseUtil.success("store 전체 유저 삭제 완료");
+
+    }
+
     @PatchMapping("/{userId}")
     public ResponseEntity<ApiResponse<String>> updateUser(@PathVariable UUID userId,
                                                           @RequestBody UserDto userDto,
