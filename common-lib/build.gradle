@@ -13,6 +13,8 @@ dependencies {
 
     implementation 'org.springframework:spring-web'
 
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
