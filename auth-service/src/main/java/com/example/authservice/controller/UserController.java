@@ -1,7 +1,7 @@
 package com.example.authservice.controller;
 
 import com.example.authservice.dto.SignupDto;
-import com.example.authservice.dto.UserDto;
+import com.example.dto.UserDto;
 import com.example.authservice.service.UserService;
 import com.example.dto.ApiResponse;
 import com.example.util.AuthUtil;
@@ -9,7 +9,6 @@ import com.example.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
