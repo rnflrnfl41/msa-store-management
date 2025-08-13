@@ -20,3 +20,7 @@ eureka:
 
 security:
   internal-token: ${INTERNAL_TOKEN}
+
+external:
+  base-url:
+    user-service: 'http://localhost:8081/api/user'
