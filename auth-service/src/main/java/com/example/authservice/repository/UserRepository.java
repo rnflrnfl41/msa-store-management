@@ -20,6 +20,6 @@ public interface UserRepository extends JpaRepository <User, UUID> {
     long countByStoreId(UUID storeId);
     
     // 전체 시스템의 유저 수 조회 (JPQL 사용)
-    @Query("SELECT COUNT(u) FROM User u")
+    @Query("SELECT COUNT(u) FROM User u where u.role = 'ROLE_USER' ")
     int getTotalUserCount();
 }
