@@ -79,6 +79,7 @@ public class GlobalExceptionHandler {
                 .uri(request.getRequestURI())
                 .method(request.getMethod())
                 .stackTrace(ExceptionUtils.getStackTrace(ex))
+                .requestParams(request.getQueryString())
                 .build());
 
         return ResponseEntity.status(500)
