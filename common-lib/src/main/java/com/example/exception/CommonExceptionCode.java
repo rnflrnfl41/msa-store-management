@@ -27,6 +27,10 @@ public enum CommonExceptionCode {
     NO_PERMISSIONS(HttpStatus.INTERNAL_SERVER_ERROR,"접근 권한이 없습니다."),
 
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND,"해당하는 점포가 없습니다."),
+    STORE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "점포 생성에 실패했습니다."),
+    STORE_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "점포 수정에 실패했습니다."),
+    STORE_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "점포 삭제에 실패했습니다."),
+    EXTERNAL_SERVICE_CALL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "외부 서비스 호출에 실패했습니다."),
 
     NO_STORE_ID(HttpStatus.NOT_FOUND,"점포 아이디가 없습니다"),
 
