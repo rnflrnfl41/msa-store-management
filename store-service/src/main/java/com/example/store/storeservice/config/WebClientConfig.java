@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -18,6 +20,8 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 
 import static com.example.Constant.HttpHeaderConstants.X_GATEWAY_TOKEN;
+import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
+import static com.example.Constant.RoleConstants.ROLE_ADMIN;
 
 @Configuration
 @Slf4j
@@ -32,33 +36,10 @@ public class WebClientConfig {
                 .baseUrl(userServiceBaseUrl) // ex: http://localhost:8081/api/user
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // 기본 헤더 설정
                 .defaultHeader(X_GATEWAY_TOKEN, securityProperties.getInternalToken()) // 요청/응답 로깅 필터
+                .defaultHeader(X_USER_ROLE, ROLE_ADMIN)
                 .filter(logRequest())
-                .filter(handleErrorResponse())
                 .build();
     }
-
-    private ExchangeFilterFunction handleErrorResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-            if (clientResponse.statusCode().is4xxClientError() || clientResponse.statusCode().is5xxServerError()) {
-                int statusCode = clientResponse.statusCode().value();
-                return clientResponse.bodyToMono(ErrorResponse.class)
-                        .defaultIfEmpty(new ErrorResponse(
-                                "외부 서비스 오류",
-                                clientResponse.statusCode().is4xxClientError() ? "USER_SERVICE_4XX" : "USER_SERVICE_5XX",
-                                statusCode,
-                                LocalDateTime.now()
-                        ))
-                        .flatMap(err -> {
-                            CommonExceptionCode enumCode = CommonExceptionCode.valueOf(err.getCode());
-                            return Mono.error(enumCode != null
-                                    ? new CommonException(enumCode)
-                                    : new CommonException(HttpStatus.valueOf(err.getStatus()), err.getCode(), err.getMessage()));
-                        });
-            }
-            return Mono.just(clientResponse);
-        });
-    }
-
 
     private ExchangeFilterFunction logRequest() {
         return (request, next) -> {
@@ -71,5 +52,6 @@ public class WebClientConfig {
             return next.exchange(request);
         };
     }
+
 
 }
