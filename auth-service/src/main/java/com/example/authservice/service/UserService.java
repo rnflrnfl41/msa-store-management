@@ -51,6 +51,15 @@ public class UserService {
 
     }
 
+    // 전체 시스템의 총 유저 수 조회
+    public long getTotalUserCount() {
+        return userRepository.getTotalUserCount();
+    }
+    
+    // 특정 스토어의 유저 수 조회
+    public long getUserCountByStoreId(UUID storeId) {
+        return userRepository.countByStoreId(storeId);
+    }
 
     public void updateUser(UUID userId, UserDto userDto) {
 
