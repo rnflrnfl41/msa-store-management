@@ -10,21 +10,27 @@ repositories {
 }
 
 dependencies {
-
+    // Spring Core
+    implementation 'org.springframework:spring-context'
     implementation 'org.springframework:spring-web'
 
+    // JSON 처리
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Validation
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-
-    //Jwt
+    // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+
+    // Lombok (중복 제거)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 }
 
 // JAR 파일 생성 활성화
