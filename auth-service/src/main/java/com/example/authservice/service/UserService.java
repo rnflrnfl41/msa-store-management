@@ -52,7 +52,7 @@ public class UserService {
     }
 
     // 전체 시스템의 총 유저 수 조회
-    public long getTotalUserCount() {
+    public int getTotalUserCount() {
         return userRepository.getTotalUserCount();
     }
     
