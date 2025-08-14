@@ -41,6 +41,23 @@ public class UserController {
         return ResponseUtil.success(userService.getAllUserInfoByStoreId(storeId));
     }
 
+    // 전체 시스템의 총 유저 수 조회
+    @GetMapping("/count/total")
+    public ResponseEntity<ApiResponse<Long>> getTotalUserCount(@RequestHeader(X_USER_ROLE) String role) {
+        AuthUtil.validateAdmin(role);
+        long totalCount = userService.getTotalUserCount();
+        return ResponseUtil.success(totalCount);
+    }
+    
+    // 특정 스토어의 유저 수 조회
+    @GetMapping("/count/store/{storeId}")
+    public ResponseEntity<ApiResponse<Long>> getUserCountByStoreId(@PathVariable UUID storeId,
+                                                                  @RequestHeader(X_USER_ROLE) String role) {
+        AuthUtil.validateAdmin(role);
+        long storeUserCount = userService.getUserCountByStoreId(storeId);
+        return ResponseUtil.success(storeUserCount);
+    }
+
     @DeleteMapping("/{userId}")
     public ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable UUID userId,
                                                           @RequestHeader(X_USER_ROLE) String role) {
