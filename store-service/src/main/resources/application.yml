@@ -24,3 +24,9 @@ security:
 external:
   base-url:
     user-service: 'http://localhost:8081/api/user'
+
+# 로깅 설정
+logging:
+  level:
+    com.example.store.storeservice: INFO
+    com.example.store.storeservice.service: DEBUG
