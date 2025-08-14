@@ -43,9 +43,9 @@ public class UserController {
 
     // 전체 시스템의 총 유저 수 조회
     @GetMapping("/count/total")
-    public ResponseEntity<ApiResponse<Long>> getTotalUserCount(@RequestHeader(X_USER_ROLE) String role) {
+    public ResponseEntity<ApiResponse<Integer>> getTotalUserCount(@RequestHeader(X_USER_ROLE) String role) {
         AuthUtil.validateAdmin(role);
-        long totalCount = userService.getTotalUserCount();
+        int totalCount = userService.getTotalUserCount();
         return ResponseUtil.success(totalCount);
     }
     

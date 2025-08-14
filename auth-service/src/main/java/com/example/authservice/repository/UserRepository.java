@@ -21,5 +21,5 @@ public interface UserRepository extends JpaRepository <User, UUID> {
     
     // 전체 시스템의 유저 수 조회 (JPQL 사용)
     @Query("SELECT COUNT(u) FROM User u")
-    long getTotalUserCount();
+    int getTotalUserCount();
 }
