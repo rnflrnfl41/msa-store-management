@@ -5,16 +5,12 @@ import com.example.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.example.dto.ApiResponse;
 
 import java.util.List;
 import java.util.UUID;
-
-
-import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
 
 @Component
 @RequiredArgsConstructor
@@ -23,26 +19,25 @@ public class AuthServiceClient {
 
     private final WebClient userServiceWebClient;
 
-    public List<UserDto> getAllUserInfoByStoreId(UUID storeId, String userRole) {
+    public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
 
         return userServiceWebClient
                 .get()
                 .uri("/{storeId}", storeId)
-                .header(X_USER_ROLE, userRole)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<UserDto>>>() {})
                 .map(ApiResponse::getData)
                 .block();
     }
 
-    public ResponseEntity<Void> deleteUserByStoreId(int storeId, String internalToken, String userId, String userRole) {
+    public String deleteUserByStoreId(UUID storeId) {
         return userServiceWebClient
                 .delete()
-                .uri("/store/{storeId}" + storeId)
-                .header("X-USER-ROLE", userRole)
+                .uri("/store/{storeId}", storeId)
                 .retrieve()
-                .toBodilessEntity()
-                .block(); // 동기 방식. 필요 시 비동기로 처리 가능
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<String>>() {})
+                .map(ApiResponse::getData)
+                .block();
     }
 
 
