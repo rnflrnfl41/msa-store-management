@@ -43,6 +43,13 @@ public class StoreController {
         return ResponseUtil.success(storeService.getAllStore());
     }
 
+    @GetMapping("/count/total")
+    public ResponseEntity<ApiResponse<Integer>> getTotalStoreCount(@RequestHeader(X_USER_ROLE) String role) {
+        AuthUtil.validateAdmin(role);
+        int totalCount = storeService.getTotalStoreCount();
+        return ResponseUtil.success(totalCount);
+    }
+
     @GetMapping("/{publicId}")
     public ResponseEntity<ApiResponse<StoreDto>> getAllStore(
             @PathVariable UUID publicId,

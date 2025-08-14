@@ -77,4 +77,8 @@ public class StoreService {
         return storeRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.STORE_NOT_FOUND));
     }
+
+    public int getTotalStoreCount() {
+        return storeRepository.getTotalStoreCount();
+    }
 }
