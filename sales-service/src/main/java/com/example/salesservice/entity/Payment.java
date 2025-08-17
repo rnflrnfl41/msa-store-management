@@ -3,19 +3,23 @@ package com.example.salesservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "payment", schema = "sales_service")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private Integer id;
 
     @NotNull
@@ -32,12 +36,11 @@ public class Payment {
     @Column(name = "points_used")
     private Integer pointsUsed;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "created_at")
     private Instant createdAt;
 
     @NotNull
     @Column(name = "visit_id", nullable = false)
     private Integer visitId;
-
 }
