@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +35,6 @@ public class AuthService {
 
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
-
-        //관리자페이지 로그인시 Role 체크
-        if(loginRequest.getAdminLogin() && user.getRole().equals(Role.ROLE_USER)){
-            throw new CommonException(CommonExceptionCode.NO_PERMISSIONS);
-        }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CommonException(CommonExceptionCode.ID_PASSWORD_FAIL);
@@ -95,6 +91,34 @@ public class AuthService {
 
     }
 
+    @Transactional
+    public String createRefreshToken(LoginRequest loginRequest) {
+        String loginId = loginRequest.getLoginId();
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+        
+        String refreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
+        saveRefreshToken(user.getId(), refreshToken);
+        
+        return refreshToken;
+    }
+
+    @Transactional
+    public void saveRefreshToken(UUID userId, String refreshToken) {
+        refreshTokenRepository.deleteByUser_Id(userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.USER_NOT_FOUND));
+
+        RefreshToken tokenEntity = RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiredAt(jwtUtil.getRefreshTokenExpiration(refreshToken))
+                .build();
+
+        refreshTokenRepository.save(tokenEntity);
+    }
+
     public LoginResponse refreshToken(String refreshToken) {
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
@@ -127,6 +151,15 @@ public class AuthService {
 
         return response;
 
+    }
+
+    @Transactional
+    public void invalidateRefreshToken(String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElse(null);
+        if (token != null) {
+            refreshTokenRepository.delete(token);
+        }
     }
 
 }
