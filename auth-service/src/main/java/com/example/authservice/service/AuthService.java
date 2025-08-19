@@ -153,13 +153,4 @@ public class AuthService {
 
     }
 
-    @Transactional
-    public void invalidateRefreshToken(String refreshToken) {
-        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
-                .orElse(null);
-        if (token != null) {
-            refreshTokenRepository.delete(token);
-        }
-    }
-
 }

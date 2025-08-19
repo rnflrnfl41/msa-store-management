@@ -88,13 +88,6 @@ public class AuthController {
         return ResponseUtil.success(loginResponse);
     }
 
-    @PostMapping("/user/logout")
-    public ResponseEntity<ApiResponse<String>> userLogout(@RequestBody TokenRefreshRequest request) {
-        // refreshToken 무효화 (DB에서 삭제)
-        authService.invalidateRefreshToken(request.getRefreshToken());
-        return ResponseUtil.success("로그아웃 완료");
-    }
-
     @PostMapping("/user/refresh-token")
     public ResponseEntity<ApiResponse<LoginResponse>> userRefreshToken(@RequestBody TokenRefreshRequest request) {
         try {
