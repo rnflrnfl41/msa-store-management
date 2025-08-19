@@ -130,6 +130,7 @@ public class AuthService {
             throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
+        // 새로운 accessToken 생성
         Map<String, Object> newClaims = Map.of(
                 "storeId", user.getStoreId(),
                 "loginId", user.getLoginId(),
@@ -139,7 +140,12 @@ public class AuthService {
 
         String newAccessToken = jwtUtil.createToken(String.valueOf(user.getId()), newClaims);
 
-
+        // 새로운 refreshToken 생성 (Rolling 방식)
+        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
+        
+        // 기존 refreshToken 삭제 후 새로운 것 저장
+        refreshTokenRepository.delete(storedToken);
+        saveRefreshToken(user.getId(), newRefreshToken);
 
         LoginResponse response = LoginResponse.builder()
                 .userId(user.getId())
@@ -147,10 +153,85 @@ public class AuthService {
                 .storeId(user.getStoreId())
                 .userName(user.getName())
                 .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken) // 새로운 refreshToken 포함
                 .build();
 
         return response;
 
+    }
+
+    // Rolling Refresh Token 방식으로 refreshToken 갱신
+    @Transactional
+    public LoginResponse refreshTokenWithRolling(String refreshToken) {
+        RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.SAVED_REFRESH_TOKEN_NOT_EXIST));
+
+        User user = storedToken.getUser();
+
+        if (storedToken.getExpiredAt().isBefore(Instant.now())) {
+            throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        // 새로운 accessToken 생성
+        Map<String, Object> newClaims = Map.of(
+                "storeId", user.getStoreId(),
+                "loginId", user.getLoginId(),
+                "name", user.getName(),
+                "role", user.getRole()
+        );
+
+        String newAccessToken = jwtUtil.createToken(String.valueOf(user.getId()), newClaims);
+
+        // 새로운 refreshToken 생성 (Rolling 방식)
+        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
+        
+        // 기존 refreshToken 삭제 후 새로운 것 저장
+        refreshTokenRepository.delete(storedToken);
+        saveRefreshToken(user.getId(), newRefreshToken);
+
+        LoginResponse response = LoginResponse.builder()
+                .userId(user.getId())
+                .loginId(user.getLoginId())
+                .storeId(user.getStoreId())
+                .userName(user.getName())
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken) // 새로운 refreshToken 포함
+                .build();
+
+        return response;
+    }
+
+    // refreshToken 갱신용: 새로운 refreshToken 생성, 기존 refreshToken 무효화
+    @Transactional
+    public LoginResponse refreshTokenRenewal(String refreshToken) {
+        RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.SAVED_REFRESH_TOKEN_NOT_EXIST));
+
+        User user = storedToken.getUser();
+
+        if (storedToken.getExpiredAt().isBefore(Instant.now())) {
+            throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        // 새로운 refreshToken 생성
+        String newRefreshToken = jwtUtil.createRefreshToken(String.valueOf(user.getId()));
+        
+        // 기존 refreshToken 삭제 후 새로운 것 저장
+        refreshTokenRepository.delete(storedToken);
+        saveRefreshToken(user.getId(), newRefreshToken);
+
+        return LoginResponse.builder()
+            .refreshToken(newRefreshToken) // 새로운 refreshToken만 설정
+            .build();
+    }
+
+    @Transactional
+    public void invalidateRefreshToken(String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElse(null);
+        if (token != null) {
+            refreshTokenRepository.delete(token);
+        }
     }
 
 }

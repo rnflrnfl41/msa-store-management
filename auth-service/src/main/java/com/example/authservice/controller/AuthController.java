@@ -13,6 +13,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 @RestController
@@ -56,7 +57,9 @@ public class AuthController {
     }
 
     @PostMapping("/admin/refresh-token")
-    public ResponseEntity<ApiResponse<LoginResponse>> adminRefreshToken(HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> adminRefreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         try {
             String refreshToken = Arrays.stream(request.getCookies())
@@ -65,9 +68,21 @@ public class AuthController {
                     .findFirst()
                     .orElse(null);
 
-            LoginResponse response = authService.refreshToken(refreshToken);
+            // Rolling 방식으로 refreshToken 갱신
+            LoginResponse loginResponse = authService.refreshTokenWithRolling(refreshToken);
+            
+            // 새로운 refreshToken을 쿠키에 설정
+            ResponseCookie newRefreshCookie = ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
+                    .httpOnly(true)
+                    .secure(false)
+                    .sameSite("Strict")
+                    .path("/")
+                    .maxAge(Duration.ofDays(7))
+                    .build();
+            
+            response.addHeader(HttpHeaders.SET_COOKIE, newRefreshCookie.toString());
 
-            return ResponseUtil.success(response);
+            return ResponseUtil.success(loginResponse);
 
         } catch (Exception e) {
             return null;
@@ -88,10 +103,29 @@ public class AuthController {
         return ResponseUtil.success(loginResponse);
     }
 
+    @PostMapping("/user/logout")
+    public ResponseEntity<ApiResponse<String>> userLogout(@RequestBody TokenRefreshRequest request) {
+        // refreshToken 무효화 (DB에서 삭제)
+        authService.invalidateRefreshToken(request.getRefreshToken());
+        return ResponseUtil.success("로그아웃 완료");
+    }
+
     @PostMapping("/user/refresh-token")
     public ResponseEntity<ApiResponse<LoginResponse>> userRefreshToken(@RequestBody TokenRefreshRequest request) {
         try {
-            LoginResponse response = authService.refreshToken(request.getRefreshToken());
+            // Rolling 방식으로 refreshToken 갱신
+            LoginResponse response = authService.refreshTokenWithRolling(request.getRefreshToken());
+            return ResponseUtil.success(response);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PostMapping("/user/refresh-token-renewal")
+    public ResponseEntity<ApiResponse<LoginResponse>> userRefreshTokenRenewal(@RequestBody TokenRefreshRequest request) {
+        try {
+            // refreshToken만 갱신하여 반환
+            LoginResponse response = authService.refreshTokenRenewal(request.getRefreshToken());
             return ResponseUtil.success(response);
         } catch (Exception e) {
             return null;
