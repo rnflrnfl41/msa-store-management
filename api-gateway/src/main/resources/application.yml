@@ -14,9 +14,7 @@ spring:
           '[/**]':
            allowedOrigins:
             - http://localhost:3000
-            - http://localhost:8282
-            - ${LOCAL_IP_USER_CORS} //이건 api-gateway editConfiguration에서 environment variables 설정 해줘야함 (http://내 로컬 IP:8282)
-            - ${LOCAL_IP_ADMIN_CORS} //이건 api-gateway editConfiguration에서 environment variables 설정 해줘야함 (http://내 로컬 IP:3000)
+            - http://localhost:8081
            allowedMethods:
             - GET
             - POST
