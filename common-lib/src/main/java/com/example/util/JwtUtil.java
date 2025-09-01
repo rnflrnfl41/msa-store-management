@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
@@ -71,14 +72,18 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Instant getRefreshTokenExpiration(String token) {
+    public LocalDateTime getRefreshTokenExpiration(String token) {
         Date expiration = Jwts.parser()
                 .setSigningKey(decodedSecretKey)
                 .parseClaimsJws(token)
                 .getBody()
                 .getExpiration();
 
-        return expiration.toInstant();
+        LocalDateTime localDateTimeExpiration = expiration.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        return localDateTimeExpiration;
     }
 
 }

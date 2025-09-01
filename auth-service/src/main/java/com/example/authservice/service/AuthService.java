@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -126,7 +127,7 @@ public class AuthService {
 
         User user = storedToken.getUser();
 
-        if (storedToken.getExpiredAt().isBefore(Instant.now())) {
+        if (storedToken.getExpiredAt().isBefore(LocalDateTime.now())) {
             throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
@@ -168,7 +169,7 @@ public class AuthService {
 
         User user = storedToken.getUser();
 
-        if (storedToken.getExpiredAt().isBefore(Instant.now())) {
+        if (storedToken.getExpiredAt().isBefore(LocalDateTime.now())) {
             throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
@@ -209,7 +210,7 @@ public class AuthService {
 
         User user = storedToken.getUser();
 
-        if (storedToken.getExpiredAt().isBefore(Instant.now())) {
+        if (storedToken.getExpiredAt().isBefore(LocalDateTime.now())) {
             throw new CommonException(CommonExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
