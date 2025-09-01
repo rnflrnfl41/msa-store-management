@@ -50,35 +50,35 @@ public class StoreController {
         return ResponseUtil.success(totalCount);
     }
 
-    @GetMapping("/{publicId}")
+    @GetMapping("/{storeId}")
     public ResponseEntity<ApiResponse<StoreDto>> getAllStore(
-            @PathVariable UUID publicId,
+            @PathVariable int storeId,
             @RequestHeader(X_USER_ROLE) String role) {
 
         //관리자 계정만 접근 가능
         AuthUtil.validateAdmin(role);
 
-        return ResponseUtil.success(storeService.getStore(publicId));
+        return ResponseUtil.success(storeService.getStore(storeId));
     }
 
-    @PatchMapping("/{publicId}")
-    public ResponseEntity<ApiResponse<String>> updateStore(@PathVariable UUID publicId,
+    @PatchMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<String>> updateStore(@PathVariable int storeId,
                                                            @RequestBody StoreDto storeDto,
                                                            @RequestHeader(X_USER_ROLE) String role) {
 
         AuthUtil.validateAdmin(role);
-        storeService.updateStore(publicId, storeDto);
+        storeService.updateStore(storeId, storeDto);
 
         return ResponseUtil.success("점포정보 수정 완료");
 
     }
 
-    @DeleteMapping("{publicId}")
-    public ResponseEntity<ApiResponse<String>> deleteStore(@PathVariable UUID publicId,
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<String>> deleteStore(@PathVariable int storeId,
                                                            @RequestHeader(X_USER_ROLE) String role) {
 
         AuthUtil.validateAdmin(role);
-        storeService.deleteStore(publicId);
+        storeService.deleteStore(storeId);
 
         return ResponseUtil.success("점포 삭제 완료");
 

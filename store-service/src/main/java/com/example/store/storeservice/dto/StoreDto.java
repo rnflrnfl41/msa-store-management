@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 public class StoreDto {
 
-    private UUID publicId;
+    private int id;
 
     private String name;
 

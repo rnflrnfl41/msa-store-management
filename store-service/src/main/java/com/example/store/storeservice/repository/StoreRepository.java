@@ -9,9 +9,9 @@ import java.util.UUID;
 
 public interface StoreRepository extends JpaRepository <Store, Integer> {
 
-    Optional<Store> findByPublicId(UUID publicId);
+    Optional<Store> findById(int id);
 
-    void deleteByPublicId(UUID publicId);
+    void deleteById(int id);
 
     @Query("SELECT COUNT(s) FROM Store s")
     int getTotalStoreCount();

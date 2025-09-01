@@ -19,7 +19,7 @@ public class ErrorLogService {
     private final ErrorLogRepository errorLogRepository;
     
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void internalDeleteErrorLogSave(UUID storeId, Exception error) {
+    public void internalDeleteErrorLogSave(int storeId, Exception error) {
 
         String errorCategory = "INTERNAL_SERVICE_ERROR";
         String requestParams = "{\"storeId\": \"" + storeId + "\"}";

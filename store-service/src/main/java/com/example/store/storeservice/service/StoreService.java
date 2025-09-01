@@ -37,13 +37,13 @@ public class StoreService {
                 .toList();
     }
 
-    public StoreDto getStore(UUID publicId) {
-        Store store = getStoreByPublicId(publicId);
+    public StoreDto getStore(int storeId) {
+        Store store = getStoreByPublicId(storeId);
         return modelMapper.map(store, StoreDto.class);
     }
 
-    public void updateStore(UUID publicId, StoreDto storeDto) {
-        Store store = getStoreByPublicId(publicId);
+    public void updateStore(int storeId, StoreDto storeDto) {
+        Store store = getStoreByPublicId(storeId);
         store.setName(storeDto.getName());
         store.setOwnerName(storeDto.getOwnerName());
         store.setPhone(storeDto.getPhone());
@@ -51,30 +51,30 @@ public class StoreService {
     }
 
     @Transactional
-    public void deleteStore(UUID publicId) {
+    public void deleteStore(int storeId) {
         try {
-            log.info("Store 삭제 시작: {}", publicId);
+            log.info("Store 삭제 시작: {}", storeId);
             
             // 외부 서비스 정리는 다른 클래스에 위임
-            externalServiceOrchestrator.deleteRelatedData(publicId);
+            externalServiceOrchestrator.deleteRelatedData(storeId);
             
             // Store 삭제만 담당
-            storeRepository.deleteByPublicId(publicId);
+            storeRepository.deleteById(storeId);
             
-            log.info("Store 삭제 완료: {}", publicId);
+            log.info("Store 삭제 완료: {}", storeId);
             
         } catch (Exception e) {
-            log.error("Store 삭제 실패: {}", publicId, e);
+            log.error("Store 삭제 실패: {}", storeId, e);
             
             // 별도 서비스로 에러 로그 저장
-            errorLogService.internalDeleteErrorLogSave(publicId, e);
+            errorLogService.internalDeleteErrorLogSave(storeId, e);
             
             throw new CommonException(CommonExceptionCode.STORE_DELETION_FAILED);
         }
     }
 
-    private Store getStoreByPublicId(UUID publicId) {
-        return storeRepository.findByPublicId(publicId)
+    private Store getStoreByPublicId(int storeId) {
+        return storeRepository.findById(storeId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.STORE_NOT_FOUND));
     }
 

@@ -16,7 +16,7 @@ public class ExternalServiceOrchestrator {
     
     private final AuthServiceClient authServiceClient;
     
-    public void deleteRelatedData(UUID storeId) {
+    public void deleteRelatedData(int storeId) {
         List<ServiceOperation> operations = Arrays.asList(
             new ServiceOperation(ServiceConstants.AUTH_SERVICE, () -> deleteAuthUsers(storeId)),
             new ServiceOperation(ServiceConstants.CUSTOMER_SERVICE, () -> deleteCustomers(storeId)),
@@ -26,7 +26,7 @@ public class ExternalServiceOrchestrator {
         executeOperationsSequentially(operations, storeId);
     }
     
-    private void executeOperationsSequentially(List<ServiceOperation> operations, UUID storeId) {
+    private void executeOperationsSequentially(List<ServiceOperation> operations, int storeId) {
         for (int i = 0; i < operations.size(); i++) {
             ServiceOperation operation = operations.get(i);
 
@@ -43,17 +43,17 @@ public class ExternalServiceOrchestrator {
         }
     }
     
-    private void deleteAuthUsers(UUID storeId) {
+    private void deleteAuthUsers(int storeId) {
         authServiceClient.deleteUserByStoreId(storeId);
     }
     
-    private void deleteCustomers(UUID storeId) {
+    private void deleteCustomers(int storeId) {
         // customerServiceClient.deleteCustomersByStoreId(storeId);
         // TODO: CustomerServiceClient 구현 후 활성화
         log.info("Customer Service 고객 삭제 스킵 (구현 예정): {}", storeId);
     }
     
-    private void deleteVisits(UUID storeId) {
+    private void deleteVisits(int storeId) {
         // visitServiceClient.deleteVisitsByStoreId(storeId);
         // TODO: VisitServiceClient 구현 후 활성화
         log.info("Visit Service 방문 기록 스킵 (구현 예정): {}", storeId);

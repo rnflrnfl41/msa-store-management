@@ -12,9 +12,9 @@ public interface UserRepository extends JpaRepository <User, UUID> {
 
     Optional<User> findByLoginId(String loginId);
 
-    List<User> findByStoreId(Integer storeId);
+    List<User> findByStoreId(int storeId);
 
-    void deleteByStoreId(Integer storeId);
+    void deleteByStoreId(int storeId);
     
     // 특정 스토어의 유저 수 조회
     long countByStoreId(Integer storeId);

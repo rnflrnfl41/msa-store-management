@@ -19,7 +19,7 @@ public class AuthServiceClient {
 
     private final WebClient userServiceWebClient;
 
-    public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
+    public List<UserDto> getAllUserInfoByStoreId(int storeId) {
 
         return userServiceWebClient
                 .get()
@@ -30,7 +30,7 @@ public class AuthServiceClient {
                 .block();
     }
 
-    public String deleteUserByStoreId(UUID storeId) {
+    public String deleteUserByStoreId(int storeId) {
         return userServiceWebClient
                 .delete()
                 .uri("/store/{storeId}", storeId)
