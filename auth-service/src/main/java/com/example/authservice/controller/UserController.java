@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<List<UserDto>>> getAllUserInfoByStoreId(@PathVariable UUID storeId,
+    public ResponseEntity<ApiResponse<List<UserDto>>> getAllUserInfoByStoreId(@PathVariable int storeId,
                                                                               @RequestHeader(X_USER_ROLE) String role) {
         AuthUtil.validateAdmin(role);
         return ResponseUtil.success(userService.getAllUserInfoByStoreId(storeId));
@@ -51,7 +51,7 @@ public class UserController {
     
     // 특정 스토어의 유저 수 조회
     @GetMapping("/count/store/{storeId}")
-    public ResponseEntity<ApiResponse<Long>> getUserCountByStoreId(@PathVariable UUID storeId,
+    public ResponseEntity<ApiResponse<Long>> getUserCountByStoreId(@PathVariable int storeId,
                                                                   @RequestHeader(X_USER_ROLE) String role) {
         AuthUtil.validateAdmin(role);
         long storeUserCount = userService.getUserCountByStoreId(storeId);
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     @DeleteMapping("/store/{storeId}")
-    public ResponseEntity<ApiResponse<String>> deleteUserByStoreId(@PathVariable UUID storeId,
+    public ResponseEntity<ApiResponse<String>> deleteUserByStoreId(@PathVariable int storeId,
                                                           @RequestHeader(X_USER_ROLE) String role) {
 
         AuthUtil.validateAdmin(role);

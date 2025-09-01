@@ -28,8 +28,7 @@ public class User {
 
     @NotNull
     @Column(name = "store_id", nullable = false)
-    @JdbcTypeCode(Types.CHAR)
-    private UUID storeId;
+    private Integer storeId;
 
     @Size(max = 50)
     @NotNull

@@ -71,7 +71,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String userIdx = claims.getSubject();
         String loginId = (String) claims.get("loginId");
         String name = (String) claims.get("name");
-        String storeId = (String) claims.get("storeId");
+        String storeId = String.valueOf(claims.get("storeId"));
         String role = (String) claims.get("role");
 
         // 5. 사용자 정보를 헤더에 추가

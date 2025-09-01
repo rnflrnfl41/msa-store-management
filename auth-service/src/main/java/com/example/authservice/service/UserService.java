@@ -41,7 +41,7 @@ public class UserService {
     }
 
 
-    public List<UserDto> getAllUserInfoByStoreId(UUID storeId) {
+    public List<UserDto> getAllUserInfoByStoreId(Integer storeId) {
 
         List<User> userList = userRepository.findByStoreId(storeId);
 
@@ -57,7 +57,7 @@ public class UserService {
     }
     
     // 특정 스토어의 유저 수 조회
-    public long getUserCountByStoreId(UUID storeId) {
+    public long getUserCountByStoreId(Integer storeId) {
         return userRepository.countByStoreId(storeId);
     }
 
@@ -101,7 +101,7 @@ public class UserService {
 
 
     @Transactional
-    public void deleteUserByStoreId(UUID storeId) {
+    public void deleteUserByStoreId(Integer storeId) {
         userRepository.deleteByStoreId(storeId);
     }
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 public class SignupDto {
 
-    private UUID storeId;
+    private Integer storeId;
 
     @NotBlank(message = "아이디")
     private String loginId;

@@ -16,7 +16,7 @@ public class LoginResponse {
     private UUID userId;
 
     @Schema(description = "매장명", example = "숙성21")
-    private UUID storeId;
+    private int storeId;
 
     @Schema(description = "사용자이름", example = "kim")
     private String userName;
