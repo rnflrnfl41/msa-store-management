@@ -23,7 +23,7 @@ security:
 
 external:
   base-url:
-    user-service: 'http://localhost:8081/api/user'
+    user-service: 'http://localhost:8181/api/user'
 
 # 로깅 설정
 logging:
