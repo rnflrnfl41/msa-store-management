@@ -5,7 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -25,6 +28,7 @@ public class Customer {
     private Integer id;
 
     @Column(name = "public_id", length = 36, unique = true)
+    @JdbcTypeCode(Types.CHAR)
     private String publicId;
 
     @NotBlank(message = "고객 이름은 필수입니다.")
@@ -42,6 +46,9 @@ public class Customer {
 
     @Column(name = "store_id", nullable = false)
     private Integer storeId;
+
+    @Column(name = "last_visit")
+    private LocalDate lastVisit;
 
     // 기본 생성자에서 public_id 자동 생성
     @PrePersist

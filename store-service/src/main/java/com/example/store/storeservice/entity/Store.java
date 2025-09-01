@@ -9,6 +9,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -43,7 +44,7 @@ public class Store {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     //저장시 자동으로 UUID 입력 해줌
     //DB 에서도 gen_random_uuid() 으로 해주지만

@@ -10,6 +10,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -34,11 +35,11 @@ public class Coupon {
 
     @NotNull
     @Column(name = "issued_at", nullable = false)
-    private Instant issuedAt;
+    private LocalDateTime issuedAt;
 
     @NotNull
     @Column(name = "used_at", nullable = false)
-    private Instant usedAt;
+    private LocalDateTime usedAt;
 
     @NotNull
     @Column(name = "customer_id", nullable = false)

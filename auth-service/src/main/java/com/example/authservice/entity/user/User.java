@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type;
 
 import java.sql.Types;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -50,6 +51,6 @@ public class User {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
 }
