@@ -27,7 +27,7 @@ spring:
         - id: customer-service
           uri: lb://customer-service #Load Balancer 프로토콜 사용, Eureka에 등록된 서비스 이름
           predicates:
-            - Path=/api/customers/**
+            - Path=/api/customer/**
           filters:
             - StripPrefix=0
 
