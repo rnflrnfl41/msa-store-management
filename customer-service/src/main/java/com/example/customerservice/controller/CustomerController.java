@@ -12,10 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.example.Constant.HttpHeaderConstants.X_USER_STORE_ID;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/customer")
 @RequiredArgsConstructor
 public class CustomerController {
 
@@ -25,44 +27,44 @@ public class CustomerController {
 
     // 고객 생성
     @PostMapping
-    public ResponseEntity<ApiResponse<CustomerResponse>> createCustomer(
+    public ResponseEntity<ApiResponse<String>> createCustomer(
             @Valid @RequestBody CustomerCreateRequest request,
             @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
         Integer storeId = Integer.parseInt(storeIdHeader);
-        CustomerResponse customer = customerService.createCustomer(request, storeId);
-        return ResponseUtil.created(customer);
+        customerService.createCustomer(request, storeId);
+        return ResponseUtil.created("고객 생성 완료");
     }
 
-    // ID로 고객 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomerById(
-            @PathVariable Integer id,
-            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
-        Integer storeId = Integer.parseInt(storeIdHeader);
-        CustomerResponse customer = customerService.getCustomerByIdAndStoreId(id, storeId);
-        return ResponseUtil.success(customer);
-    }
-
-    // public_id로 고객 조회
-    @GetMapping("/public/{publicId}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByPublicId(
-            @PathVariable String publicId,
-            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
-        Integer storeId = Integer.parseInt(storeIdHeader);
-        CustomerResponse customer = customerService.getCustomerByPublicIdAndStoreId(publicId, storeId);
-        return ResponseUtil.success(customer);
-    }
-
-    // 고객 정보 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
-            @PathVariable Integer id,
-            @Valid @RequestBody CustomerCreateRequest request,
-            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
-        Integer storeId = Integer.parseInt(storeIdHeader);
-        CustomerResponse updatedCustomer = customerService.updateCustomer(id, request, storeId);
-        return ResponseUtil.success(updatedCustomer);
-    }
+//    // ID로 고객 조회
+//    @GetMapping("/{id}")
+//    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomerById(
+//            @PathVariable Integer id,
+//            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
+//        Integer storeId = Integer.parseInt(storeIdHeader);
+//        CustomerResponse customer = customerService.getCustomerByIdAndStoreId(id, storeId);
+//        return ResponseUtil.success(customer);
+//    }
+//
+//    // public_id로 고객 조회
+//    @GetMapping("/public/{publicId}")
+//    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByPublicId(
+//            @PathVariable String publicId,
+//            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
+//        Integer storeId = Integer.parseInt(storeIdHeader);
+//        CustomerResponse customer = customerService.getCustomerByPublicIdAndStoreId(publicId, storeId);
+//        return ResponseUtil.success(customer);
+//    }
+//
+//    // 고객 정보 수정
+//    @PutMapping("/{id}")
+//    public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
+//            @PathVariable Integer id,
+//            @Valid @RequestBody CustomerCreateRequest request,
+//            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
+//        Integer storeId = Integer.parseInt(storeIdHeader);
+//        CustomerResponse updatedCustomer = customerService.updateCustomer(id, request, storeId);
+//        return ResponseUtil.success(updatedCustomer);
+//    }
 
     // 고객 삭제
     @DeleteMapping("/{id}")
@@ -75,12 +77,10 @@ public class CustomerController {
     }
 
     // 통합 검색
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<CustomerResponse>>> searchCustomers(
-            @ModelAttribute CustomerSearchCriteria criteria,
-            @RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<CustomerResponse>>> searchCustomers(@RequestHeader(X_USER_STORE_ID) String storeIdHeader) {
         Integer storeId = Integer.parseInt(storeIdHeader);
-        Page<CustomerResponse> customers = customerService.searchCustomers(criteria, storeId);
+        List<CustomerResponse> customers = customerService.searchAllCustomers(storeId);
         return ResponseUtil.success(customers);
     }
 

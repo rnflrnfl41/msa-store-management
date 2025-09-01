@@ -41,6 +41,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
             Pageable pageable
     );
 
+    List<Customer> findByStoreId(int storeId);
+
     // store_id로 고객 수 조회
     long countByStoreId(Integer storeId);
 
