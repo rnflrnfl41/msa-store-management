@@ -31,16 +31,19 @@ public class CustomerService {
 
     // 고객 생성
     @Transactional
-    public void createCustomer(CustomerCreateRequest request, Integer storeId) {
+    public CustomerResponse createCustomer(CustomerCreateRequest request, Integer storeId) {
         // 전화번호 중복 확인
-        validatePhoneUniqueness(request.getPhone(), storeId, null);
+        validatePhoneUniqueness(request.getPhone(), storeId);
 
-        Customer customer = Customer.builder()
+        Customer savedCustomer = customerRepository.save(
+                Customer.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .storeId(storeId)
-                .build();
-        customerRepository.save(customer);
+                .build()
+        );
+
+        return modelMapper.map(savedCustomer, CustomerResponse.class);
     }
 
     /*// ID로 고객 조회 (store_id 검증 포함)
@@ -57,21 +60,23 @@ public class CustomerService {
         return CustomerResponse.from(customer);
     }*/
 
-    /*// 고객 정보 수정
+    // 고객 정보 수정
     @Transactional
-    public CustomerResponse updateCustomer(Integer id, CustomerCreateRequest request, Integer storeId) {
-        Customer existingCustomer = customerRepository.findByIdAndStoreId(id, storeId)
+    public void updateCustomer(Integer customerId, CustomerCreateRequest request, Integer storeId) {
+
+        Customer existingCustomer = customerRepository.findByIdAndStoreId(customerId, storeId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.CUSTOMER_NOT_FOUND));
 
         // 전화번호 변경 시 중복 확인
-        validatePhoneUniqueness(request.getPhone(), storeId, existingCustomer.getPhone());
+        if(!request.getPhone().equals(existingCustomer.getPhone())){
+            validatePhoneUniqueness(request.getPhone(), storeId);
+        }
 
         existingCustomer.setName(request.getName());
         existingCustomer.setPhone(request.getPhone());
 
-        Customer updatedCustomer = customerRepository.save(existingCustomer);
-        return CustomerResponse.from(updatedCustomer);
-    }*/
+        customerRepository.save(existingCustomer);
+    }
 
     // 고객 삭제
     @Transactional
@@ -97,15 +102,9 @@ public class CustomerService {
         return customerRepository.countByStoreId(storeId);
     }
 
-    // 전화번호 중복 검증 (private 메서드)
-    private void validatePhoneUniqueness(String newPhone, Integer storeId, String existingPhone) {
-        if (newPhone != null && !newPhone.isEmpty()) {
-            // 수정 시에는 기존 전화번호와 다를 때만 검증
-            if (!newPhone.equals(existingPhone)) {
-                if (customerRepository.existsByPhoneAndStoreId(newPhone, storeId)) {
-                    throw new CommonException(CommonExceptionCode.DUPLICATE_LOGIN_ID);
-                }
-            }
+    private void validatePhoneUniqueness(String newPhone, Integer storeId) {
+        if (customerRepository.existsByPhoneAndStoreId(newPhone, storeId)) {
+            throw new CommonException(CommonExceptionCode.DUPLICATE_PHONE_NUM);
         }
     }
 }
