@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -35,10 +38,14 @@ public class Payment {
 
     @NotNull
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @NotNull
-    @Column(name = "visit_id", nullable = false)
-    private Integer visitId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "visit_id", nullable = false)
+    private Visit visit;
+
 
 }
