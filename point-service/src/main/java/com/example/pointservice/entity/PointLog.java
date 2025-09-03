@@ -6,30 +6,29 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "point", schema = "point_service")
-public class Point {
+@Table(name = "point_log", schema = "point_service")
+public class PointLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @NotNull
     @Column(name = "customer_id", nullable = false)
-    private Integer customerId;
+    private int customerId;
 
-    @NotNull
+    @Column(name = "type",length = 20, nullable = false)
+    private String type;
+
     @Column(name = "store_id", nullable = false)
-    private Integer storeId;
+    private int storeId;
 
-    @NotNull
     @Column(name = "point_amount", nullable = false)
-    private Integer pointAmount;
+    private int pointAmount;
 
     @Lob
     @Column(name = "reason")

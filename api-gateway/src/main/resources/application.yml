@@ -55,7 +55,7 @@ spring:
         - id: point-service
           uri: lb://point-service
           predicates:
-            - Path=/api/point/**
+            - Path=/api/point/**,/api/coupon/**,/api/benefit/**
           filters:
             - StripPrefix=0
 

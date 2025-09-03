@@ -1,52 +1,51 @@
 package com.example.pointservice.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.JdbcTypeCode;
 
-import java.sql.Types;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "coupon", schema = "point_service")
+@Table(name = "coupon")
 public class Coupon {
+    
     @Id
-    @Column(name = "id", nullable = false, length = 36)
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JdbcTypeCode(Types.CHAR) //JPA가 UUID를 바이트 배열이 아닌, 36자리의 문자열로 처리
-    private UUID id;
+    @Column(name = "id", length = 36)
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String id;
 
-    @Size(max = 30)
-    @Column(name = "type", length = 30)
+    @Column(name = "name", length = 100, nullable = false)
+    private String name;
+
+    @Column(name = "amount", nullable = false)
+    private int amount;
+
+    @Column(name = "type", length = 30, nullable = false)
     private String type;
 
-    @Size(max = 20)
-    @Column(name = "status", length = 20)
-    private String status;
+    @Column(name = "is_used")
+    private Boolean isUsed;
 
-    @NotNull
-    @Column(name = "issued_at", nullable = false)
-    private LocalDateTime issuedAt;
+    @CreationTimestamp
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
 
-    @NotNull
-    @Column(name = "used_at", nullable = false)
-    private LocalDateTime usedAt;
+    @Column(name = "used_date")
+    private LocalDate usedDate;
 
-    @NotNull
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
+
     @Column(name = "customer_id", nullable = false)
-    private Integer customerId;
+    private int customerId;
 
-    @NotNull
     @Column(name = "store_id", nullable = false)
-    private Integer storeId;
-
+    private int storeId;
 }
