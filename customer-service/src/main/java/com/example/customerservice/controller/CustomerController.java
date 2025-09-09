@@ -1,5 +1,6 @@
 package com.example.customerservice.controller;
 
+import com.example.customerservice.dto.CustomerBenefitResponse;
 import com.example.customerservice.dto.CustomerCreateRequest;
 import com.example.customerservice.dto.CustomerResponse;
 import com.example.customerservice.dto.CustomerSearchCriteria;
@@ -97,5 +98,14 @@ public class CustomerController {
         Integer storeId = Integer.parseInt(storeIdHeader);
         long count = customerService.getCustomerCountByStoreId(storeId);
         return ResponseUtil.success(count);
+    }
+
+    @GetMapping("/all/benefit")
+    public ResponseEntity<ApiResponse<List<CustomerBenefitResponse>>> searchCustomersHaveBenefit(
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        List<CustomerBenefitResponse> customersAndBenefit = customerService.searchCustomersHaveBenefit(storeId);
+        return ResponseUtil.success(customersAndBenefit);
     }
 }

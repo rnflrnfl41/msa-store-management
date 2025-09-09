@@ -1,5 +1,6 @@
 package com.example.customerservice.service;
 
+import com.example.customerservice.dto.CustomerBenefitResponse;
 import com.example.customerservice.dto.CustomerCreateRequest;
 import com.example.customerservice.dto.CustomerResponse;
 import com.example.customerservice.dto.CustomerSearchCriteria;
@@ -91,9 +92,9 @@ public class CustomerService {
     // 통합 검색
     public List<CustomerResponse> searchAllCustomers( Integer storeId) {
         
-        List<Customer> customerPage = customerRepository.findByStoreId(storeId);
+        List<Customer> customers = customerRepository.findByStoreId(storeId);
 
-        return customerPage.stream().map(cus -> modelMapper.map(cus, CustomerResponse.class)).toList();
+        return customers.stream().map(cus -> modelMapper.map(cus, CustomerResponse.class)).toList();
 
     }
 
@@ -106,5 +107,13 @@ public class CustomerService {
         if (customerRepository.existsByPhoneAndStoreId(newPhone, storeId)) {
             throw new CommonException(CommonExceptionCode.DUPLICATE_PHONE_NUM);
         }
+    }
+
+    public List<CustomerBenefitResponse> searchCustomersHaveBenefit(Integer storeId) {
+
+        List<Customer> customers = customerRepository.findByStoreId(storeId);
+
+        return null;
+
     }
 }
