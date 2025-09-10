@@ -11,6 +11,8 @@ import java.util.List;
 @Builder
 public class CustomerBenefitResponse {
 
+    private int customerId;
+
     private int points;
 
     private List<CouponDto> couponDtoList;
