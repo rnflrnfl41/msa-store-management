@@ -3,7 +3,6 @@ package com.example.customerservice.service;
 import com.example.customerservice.dto.CustomerBenefitResponse;
 import com.example.customerservice.dto.CustomerCreateRequest;
 import com.example.customerservice.dto.CustomerResponse;
-import com.example.customerservice.dto.CustomerSearchCriteria;
 import com.example.customerservice.entity.Customer;
 import com.example.customerservice.repository.CustomerRepository;
 import com.example.exception.CommonException;
