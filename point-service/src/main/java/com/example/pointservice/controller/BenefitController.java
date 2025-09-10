@@ -19,6 +19,10 @@ public class BenefitController {
 
     private final BenefitService benefitService;
 
+    /**
+     * 단일 고객의 혜택 정보 조회 (포인트 + 쿠폰)
+     * GET /api/benefit/{customerId}
+     */
     @GetMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerBenefitResponse>> getCustomerBenefitList(
             @PathVariable Integer customerId,
@@ -26,6 +30,20 @@ public class BenefitController {
     ) {
         Integer storeId = Integer.parseInt(storeIdHeader);
         return ResponseUtil.success(benefitService.getCustomerBenefitList(storeId, customerId));
+    }
+
+    /**
+     * 여러 고객의 혜택 정보 일괄 조회 (포인트 + 쿠폰)
+     * POST /api/benefit/batch
+     * Body: [customerId1, customerId2, ...]
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<ApiResponse<List<CustomerBenefitResponse>>> getCustomerBenefitListBatch(
+            @RequestBody List<Integer> customerIds,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(benefitService.getCustomerBenefitListBatch(storeId, customerIds));
     }
 
 }
