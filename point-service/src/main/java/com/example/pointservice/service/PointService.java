@@ -8,6 +8,10 @@ import com.example.pointservice.repository.PointLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class PointService {
@@ -21,4 +25,17 @@ public class PointService {
                 .map(PointBalance::getTotalPoints).orElse(0);
     }
 
+    public Map<Integer, Integer> getCustomerPointsBatch(Integer storeId, List<Integer> customerIds) {
+
+        List<PointBalance> pointBalances = pointBalanceRepository
+                .findByStoreIdAndCustomerIdIn(storeId, customerIds);
+
+        // 2. Map으로 변환 (customerId -> totalPoints)
+        return pointBalances.stream()
+                .collect(Collectors.toMap(
+                        PointBalance::getCustomerId,
+                        PointBalance::getTotalPoints
+                ));
+
+    }
 }
