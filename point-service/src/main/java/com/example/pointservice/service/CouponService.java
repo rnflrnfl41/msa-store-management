@@ -2,12 +2,15 @@ package com.example.pointservice.service;
 
 import com.example.pointservice.dto.CouponDto;
 import com.example.pointservice.entity.Coupon;
+import com.example.pointservice.entity.PointBalance;
 import com.example.pointservice.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +38,21 @@ public class CouponService {
                 .usedDate(coupon.getUsedDate())
                 .build();
     }
+
+    public Map<Integer, List<CouponDto>> getCustomerCouponListBatch(Integer storeId, List<Integer> customerIds) {
+
+        List<Coupon> couponList = couponRepository.findByStoreIdAndCustomerIdIn(storeId, customerIds);
+
+        return couponList.stream()
+                .collect(Collectors.groupingBy(
+                        Coupon::getCustomerId,
+                        Collectors.mapping(
+                                this::convertToDto,
+                                Collectors.toList()
+                        )
+                ));
+
+    }
+
 
 }
