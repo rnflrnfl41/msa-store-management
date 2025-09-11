@@ -1,7 +1,8 @@
 package com.example.pointservice.controller;
 
 import com.example.dto.ApiResponse;
-import com.example.pointservice.dto.CustomerBenefitResponse;
+import com.example.dto.PointServiceBenefitResponse;
+import com.example.pointservice.dto.BenefitResponse;
 import com.example.pointservice.service.BenefitService;
 import com.example.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class BenefitController {
      * GET /api/benefit/{customerId}
      */
     @GetMapping("/{customerId}")
-    public ResponseEntity<ApiResponse<CustomerBenefitResponse>> getCustomerBenefitList(
+    public ResponseEntity<ApiResponse<BenefitResponse>> getCustomerBenefitList(
             @PathVariable Integer customerId,
             @RequestHeader(X_USER_STORE_ID) String storeIdHeader
     ) {
@@ -38,7 +39,7 @@ public class BenefitController {
      * Body: [customerId1, customerId2, ...]
      */
     @PostMapping("/batch")
-    public ResponseEntity<ApiResponse<List<CustomerBenefitResponse>>> getCustomerBenefitListBatch(
+    public ResponseEntity<ApiResponse<List<PointServiceBenefitResponse>>> getCustomerBenefitListBatch(
             @RequestBody List<Integer> customerIds,
             @RequestHeader(X_USER_STORE_ID) String storeIdHeader
     ) {
