@@ -22,13 +22,12 @@ public class WebClientConfig {
     private String pointServiceBaseUrl;
 
     @Bean
-    public WebClient userServiceWebClient(WebClient.Builder builder, SecurityProperties securityProperties) {
+    public WebClient pointServiceWebClient(WebClient.Builder builder, SecurityProperties securityProperties) {
         return builder
                 .baseUrl(pointServiceBaseUrl) // ex: http://localhost:8081/api/user
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // 기본 헤더 설정
-                .defaultHeader(X_GATEWAY_TOKEN, securityProperties.getInternalToken()) // 요청/응답 로깅 필터
-                .defaultHeader(X_USER_ROLE, ROLE_ADMIN)
-                .filter(logRequest())
+                .defaultHeader(X_GATEWAY_TOKEN, securityProperties.getInternalToken())
+                .filter(logRequest()) // 요청/응답 로깅 필터
                 .build();
     }
 

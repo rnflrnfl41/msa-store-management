@@ -1,13 +1,16 @@
 package com.example.customerservice.dto;
 
+import com.example.dto.CustomerCoupon;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Setter
 @Getter
 public class CustomerBenefitResponse {
 
-    private int customerId;
+    private int id;
 
     private String name;
 
@@ -15,6 +18,6 @@ public class CustomerBenefitResponse {
 
     private int points;
 
-    private CustomerCoupon coupons;
+    private List<CustomerCoupon> coupons;
 
 }

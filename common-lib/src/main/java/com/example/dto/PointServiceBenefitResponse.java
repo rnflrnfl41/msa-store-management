@@ -1,4 +1,4 @@
-package com.example.pointservice.dto;
+package com.example.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,12 +9,12 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
-public class CustomerBenefitResponse {
+public class PointServiceBenefitResponse {
 
     private int customerId;
 
     private int points;
 
-    private List<CouponDto> couponDtoList;
+    private List<CustomerCoupon> coupons;
 
 }
