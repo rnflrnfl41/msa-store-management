@@ -1,8 +1,8 @@
 package com.example.pointservice.service;
 
+import com.example.dto.CustomerCoupon;
 import com.example.pointservice.dto.CouponDto;
 import com.example.pointservice.entity.Coupon;
-import com.example.pointservice.entity.PointBalance;
 import com.example.pointservice.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,7 +30,7 @@ public class CouponService {
         return CouponDto.builder()
                 .id(coupon.getId())
                 .name(coupon.getName())
-                .amount(String.valueOf(coupon.getAmount()))
+                .amount(coupon.getAmount())
                 .type(coupon.getType())
                 .createdDate(coupon.getCreatedDate().toLocalDate())
                 .expiryDate(coupon.getExpiryDate())
@@ -39,15 +39,17 @@ public class CouponService {
                 .build();
     }
 
-    public Map<Integer, List<CouponDto>> getCustomerCouponListBatch(Integer storeId, List<Integer> customerIds) {
 
-        List<Coupon> couponList = couponRepository.findByStoreIdAndCustomerIdIn(storeId, customerIds);
+
+    public Map<Integer, List<CustomerCoupon>> getCustomerCouponListBatch(Integer storeId, List<Integer> customerIds) {
+
+        List<Coupon> couponList = couponRepository.findValidCouponsByStoreIdAndCustomerIdIn(storeId, customerIds);
 
         return couponList.stream()
                 .collect(Collectors.groupingBy(
                         Coupon::getCustomerId,
                         Collectors.mapping(
-                                this::convertToDto,
+                                coupon -> modelMapper.map(coupon, CustomerCoupon.class),
                                 Collectors.toList()
                         )
                 ));
