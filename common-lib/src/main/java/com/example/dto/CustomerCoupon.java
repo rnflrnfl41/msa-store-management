@@ -1,4 +1,4 @@
-package com.example.customerservice.dto;
+package com.example.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ public class CustomerCoupon {
 
     private String name;
 
-    private String amount;
+    private int amount;
 
     private String type;
 }
