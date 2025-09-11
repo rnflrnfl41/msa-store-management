@@ -15,7 +15,7 @@ public class CouponDto {
 
     private String name;
 
-    private String amount;
+    private int amount;
 
     private String type;
 
