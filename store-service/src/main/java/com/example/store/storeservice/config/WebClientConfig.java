@@ -35,9 +35,9 @@ public class WebClientConfig {
         return builder
                 .baseUrl(userServiceBaseUrl) // ex: http://localhost:8081/api/user
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // 기본 헤더 설정
-                .defaultHeader(X_GATEWAY_TOKEN, securityProperties.getInternalToken()) // 요청/응답 로깅 필터
+                .defaultHeader(X_GATEWAY_TOKEN, securityProperties.getInternalToken())
                 .defaultHeader(X_USER_ROLE, ROLE_ADMIN)
-                .filter(logRequest())
+                .filter(logRequest()) // 요청/응답 로깅 필터
                 .build();
     }
 
