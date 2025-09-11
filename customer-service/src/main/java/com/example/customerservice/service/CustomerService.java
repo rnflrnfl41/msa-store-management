@@ -1,6 +1,7 @@
 package com.example.customerservice.service;
 
 import com.example.customerservice.dto.CustomerBenefitResponse;
+import com.example.dto.PointServiceBenefitResponse;
 import com.example.customerservice.dto.CustomerCreateRequest;
 import com.example.customerservice.dto.CustomerResponse;
 import com.example.customerservice.entity.Customer;
@@ -9,14 +10,13 @@ import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -26,6 +26,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
+    private final PointServiceClient pointServiceClient;
 
 
 
@@ -112,7 +113,31 @@ public class CustomerService {
 
         List<Customer> customers = customerRepository.findByStoreId(storeId);
 
-        return null;
+        List<Integer> customerIds = customers.stream().map(Customer::getId).toList();
+
+        //point-service에서 모든 customer 쿠폰이랑 point 가져오기
+        List<PointServiceBenefitResponse> benefitList = pointServiceClient.getCustomerBenefitListBatch(customerIds, storeId);
+
+        // point-service에서 받아온 데이터 Map으로 변환 (빠른 조회를 위해)
+        Map<Integer, PointServiceBenefitResponse> benefitMap = benefitList.stream()
+            .collect(Collectors.toMap(
+                PointServiceBenefitResponse::getCustomerId,
+                Function.identity()
+            ));
+
+        // 고객 정보 + 혜택 정보 병합
+        return customers.stream()
+            .map(customer -> {
+                PointServiceBenefitResponse benefit = benefitMap.get(customer.getId());
+                CustomerBenefitResponse response = new CustomerBenefitResponse();
+                response.setId(customer.getId());
+                response.setName(customer.getName());
+                response.setPhone(customer.getPhone());
+                response.setPoints(benefit != null ? benefit.getPoints() : 0);
+                response.setCoupons(benefit != null ? benefit.getCoupons() : null);
+                return response;
+            })
+            .collect(Collectors.toList());
 
     }
 }
