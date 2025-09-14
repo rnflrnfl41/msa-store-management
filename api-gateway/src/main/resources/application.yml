@@ -52,10 +52,10 @@ spring:
           filters:
             - StripPrefix=0
 
-        - id: point-service
-          uri: lb://point-service
+        - id: benefit-service
+          uri: lb://benefit-service
           predicates:
-            - Path=/api/point/**,/api/coupon/**,/api/benefit/**
+            - Path=/api/benefit/**
           filters:
             - StripPrefix=0
 

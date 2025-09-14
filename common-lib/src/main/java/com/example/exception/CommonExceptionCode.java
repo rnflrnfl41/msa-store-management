@@ -38,6 +38,13 @@ public enum CommonExceptionCode {
 
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "고객을 찾을 수 없습니다."),
 
+    BENEFIT_USE_FAILED(HttpStatus.NOT_FOUND, "쿠폰 및 포인트 사용 실패."),
+
+    NOT_ENOUGH_POINT(HttpStatus.INTERNAL_SERVER_ERROR, "포인트가 충분하지 않습니다."),
+
+    NO_COUPON(HttpStatus.NOT_FOUND, "해당 쿠폰을 찾을 수 없습니다."),
+    COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 사용된 쿠폰입니다."),
+
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "파라미터가 올바르지않습니다.");
 
     private final HttpStatus status;

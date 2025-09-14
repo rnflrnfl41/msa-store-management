@@ -20,3 +20,7 @@ eureka:
 
 security:
   internal-token: ${INTERNAL_TOKEN}
+
+external:
+  base-url:
+    benefit-service: 'http://localhost:8084/api/benefit'
