@@ -13,7 +13,7 @@ public final class ServiceConstants {
     public static final String AUTH_SERVICE = "Auth Service";
     public static final String CUSTOMER_SERVICE = "Customer Service";
     public static final String VISIT_SERVICE = "Visit Service";
-    public static final String POINT_SERVICE = "Point Service";
+    public static final String BENEFIT_SERVICE = "Benefit Service";
     public static final String EXPENSE_SERVICE = "Expense Service";
     public static final String SALES_SERVICE = "Sales Service";
     public static final String STORE_SERVICE = "Store Service";

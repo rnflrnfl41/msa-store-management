@@ -1,7 +1,7 @@
 package com.example.customerservice.service;
 
 import com.example.customerservice.dto.CustomerBenefitResponse;
-import com.example.dto.PointServiceBenefitResponse;
+import com.example.dto.BenefitServiceBenefitResponse;
 import com.example.customerservice.dto.CustomerCreateRequest;
 import com.example.customerservice.dto.CustomerResponse;
 import com.example.customerservice.entity.Customer;
@@ -115,20 +115,20 @@ public class CustomerService {
 
         List<Integer> customerIds = customers.stream().map(Customer::getId).toList();
 
-        //point-service에서 모든 customer 쿠폰이랑 point 가져오기
-        List<PointServiceBenefitResponse> benefitList = pointServiceClient.getCustomerBenefitListBatch(customerIds, storeId);
+        //benefit-service에서 모든 customer 쿠폰이랑 point 가져오기
+        List<BenefitServiceBenefitResponse> benefitList = pointServiceClient.getCustomerBenefitListBatch(customerIds, storeId);
 
         // point-service에서 받아온 데이터 Map으로 변환 (빠른 조회를 위해)
-        Map<Integer, PointServiceBenefitResponse> benefitMap = benefitList.stream()
+        Map<Integer, BenefitServiceBenefitResponse> benefitMap = benefitList.stream()
             .collect(Collectors.toMap(
-                PointServiceBenefitResponse::getCustomerId,
+                BenefitServiceBenefitResponse::getCustomerId,
                 Function.identity()
             ));
 
         // 고객 정보 + 혜택 정보 병합
         return customers.stream()
             .map(customer -> {
-                PointServiceBenefitResponse benefit = benefitMap.get(customer.getId());
+                BenefitServiceBenefitResponse benefit = benefitMap.get(customer.getId());
                 CustomerBenefitResponse response = new CustomerBenefitResponse();
                 response.setId(customer.getId());
                 response.setName(customer.getName());

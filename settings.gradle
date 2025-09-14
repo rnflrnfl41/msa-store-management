@@ -8,6 +8,6 @@ include 'auth-service'
 include 'store-service'
 include 'visit-service'
 include 'sales-service'
-include 'point-service'
+include 'benefit-service'
 include 'expense-service'
 

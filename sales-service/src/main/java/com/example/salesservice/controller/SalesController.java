@@ -20,7 +20,7 @@ public class SalesController {
 
     private final SalesService salesService;
 
-    @GetMapping("/customers/{customerId}/history")
+    @GetMapping("/{customerId}/history")
     public ResponseEntity<ApiResponse<List<ServiceHistoryDto>>> getCustomerServiceHistory(
             @PathVariable Integer customerId,
             @RequestHeader(X_USER_STORE_ID) String storeIdHeader

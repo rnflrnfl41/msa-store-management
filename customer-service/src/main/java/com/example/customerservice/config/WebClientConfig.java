@@ -18,13 +18,13 @@ import static com.example.Constant.RoleConstants.ROLE_ADMIN;
 @Slf4j
 public class WebClientConfig {
 
-    @Value("${external.base-url.point-service}")
-    private String pointServiceBaseUrl;
+    @Value("${external.base-url.benefit-service}")
+    private String benefitServiceBaseUrl;
 
     @Bean
-    public WebClient pointServiceWebClient(WebClient.Builder builder, SecurityProperties securityProperties) {
+    public WebClient benefitServiceWebClient(WebClient.Builder builder, SecurityProperties securityProperties) {
         return builder
-                .baseUrl(pointServiceBaseUrl) // ex: http://localhost:8081/api/user
+                .baseUrl(benefitServiceBaseUrl) // ex: http://localhost:8081/api/user
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // 기본 헤더 설정
                 .defaultHeader(X_GATEWAY_TOKEN, securityProperties.getInternalToken())
                 .filter(logRequest()) // 요청/응답 로깅 필터

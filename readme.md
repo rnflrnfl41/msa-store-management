@@ -16,7 +16,7 @@ msa-store-management/
 ├── store-service/       # 점포 관리 서비스
 ├── customer-service/    # 고객 관리 서비스
 ├── sales-service/       # 매출 관리 서비스
-├── point-service/       # 포인트 관리 서비스
+├── benefit-service/     # 혜택 관리 서비스 (포인트, 쿠폰)
 ├── expense-service/     # 지출 관리 서비스
 └── visit-service/       # 방문 관리 서비스
 ```
@@ -100,12 +100,13 @@ msa-store-management/
   - 매출 리포트 생성
 - **데이터베이스**: MySQL
 
-### 8. Point Service (`point-service`)
-- **역할**: 포인트 시스템 관리
+### 8. Benefit Service (`benefit-service`)
+- **역할**: 고객 혜택 시스템 관리 (포인트, 쿠폰)
 - **주요 기능**:
   - 포인트 적립/사용
-  - 포인트 이력 관리
-  - 포인트 정책 설정
+  - 쿠폰 발급/사용
+  - 혜택 통합 조회
+  - 혜택 이력 관리
 - **데이터베이스**: MySQL
 
 ### 9. Expense Service (`expense-service`)
