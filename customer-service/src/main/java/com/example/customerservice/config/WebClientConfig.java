@@ -11,8 +11,6 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static com.example.Constant.HttpHeaderConstants.X_GATEWAY_TOKEN;
-import static com.example.Constant.HttpHeaderConstants.X_USER_ROLE;
-import static com.example.Constant.RoleConstants.ROLE_ADMIN;
 
 @Configuration
 @Slf4j

@@ -26,7 +26,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
-    private final PointServiceClient pointServiceClient;
+    private final BenefitServiceClient benefitServiceClient;
 
 
 
@@ -116,7 +116,7 @@ public class CustomerService {
         List<Integer> customerIds = customers.stream().map(Customer::getId).toList();
 
         //benefit-service에서 모든 customer 쿠폰이랑 point 가져오기
-        List<BenefitServiceBenefitResponse> benefitList = pointServiceClient.getCustomerBenefitListBatch(customerIds, storeId);
+        List<BenefitServiceBenefitResponse> benefitList = benefitServiceClient.getCustomerBenefitListBatch(customerIds, storeId);
 
         // point-service에서 받아온 데이터 Map으로 변환 (빠른 조회를 위해)
         Map<Integer, BenefitServiceBenefitResponse> benefitMap = benefitList.stream()
