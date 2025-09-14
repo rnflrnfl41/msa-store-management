@@ -95,7 +95,7 @@ public class SalesService {
             if (e instanceof CommonException) {
                 throw e; // 이미 CommonException이면 그대로
             } else {
-                throw new CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "매출 등록 실패.", e.getMessage());
+                throw new CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "SALES_REGISTRATION_FAILED", e.getMessage());
             }
 
         }
