@@ -15,7 +15,7 @@ import static com.example.Constant.HttpHeaderConstants.X_USER_STORE_ID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class PointServiceClient {
+public class BenefitServiceClient {
 
     private final WebClient benefitServiceWebClient;
 
