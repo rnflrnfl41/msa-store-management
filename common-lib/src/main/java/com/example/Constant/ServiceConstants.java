@@ -18,4 +18,6 @@ public final class ServiceConstants {
     public static final String SALES_SERVICE = "Sales Service";
     public static final String STORE_SERVICE = "Store Service";
 
+    public static final String INTERNAL_SERVICE_ERROR_CODE = "INTERNAL_SERVICE_ERROR";
+
 }
