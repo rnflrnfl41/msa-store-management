@@ -57,4 +57,8 @@ public class ErrorLog {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Lob
+    @Column(name = "request_params", columnDefinition = "TEXT")
+    private String requestParams;
+
 }
