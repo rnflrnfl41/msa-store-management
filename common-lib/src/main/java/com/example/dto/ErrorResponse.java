@@ -20,7 +20,7 @@ public class ErrorResponse {
 
     public ErrorResponse(CommonException ex) {
         this.message = ex.getMessage();
-        this.code = ex.getCode().name();
+        this.code = ex.getCode() != null ? ex.getCode().name() : ex.getCustomCode();
         this.status = ex.getStatus().value();
         this.timestamp = LocalDateTime.now();
     }

@@ -31,8 +31,7 @@ public class Visit {
     @Column(name = "memo")
     private String memo;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 

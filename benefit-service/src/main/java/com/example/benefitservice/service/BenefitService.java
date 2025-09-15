@@ -1,17 +1,22 @@
 package com.example.benefitservice.service;
 
+import com.example.Constant.BenefitConstant;
 import com.example.dto.BenefitServiceBenefitResponse;
 import com.example.dto.BenefitUseRequest;
 import com.example.dto.CustomerCoupon;
 import com.example.benefitservice.dto.CouponDto;
 import com.example.benefitservice.dto.BenefitResponse;
+import com.example.exception.CommonException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.example.Constant.BenefitConstant.BENEFIT_USE_COMPLETE;
 import static com.example.util.CommonUtil.isValidUUID;
 
 @Service
@@ -54,6 +59,7 @@ public class BenefitService {
     }
 
 
+    @Transactional
     public void useBenefits(Integer storeId, BenefitUseRequest request) {
 
         //사용된 포인트가 있을 시
@@ -66,10 +72,11 @@ public class BenefitService {
             couponService.useCoupon(request.getUsedCouponId(), request.getCustomerId(), storeId);
         }
 
+
     }
 
+    @Transactional
     public void rollbackUseBenefits(Integer storeId, BenefitUseRequest request){
-
 
         //사용된 포인트가 있을 시
         if(request.getUsedPoint() > 0){
@@ -80,7 +87,6 @@ public class BenefitService {
         if(!request.getUsedCouponId().isEmpty() && isValidUUID(request.getUsedCouponId())){
             couponService.rollbackUseCoupon(request.getUsedCouponId(), request.getCustomerId(), storeId);
         }
-
 
     }
 

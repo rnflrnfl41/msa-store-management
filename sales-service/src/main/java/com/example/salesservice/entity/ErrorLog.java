@@ -53,7 +53,7 @@ public class ErrorLog {
     @Column(name = "stack_trace", columnDefinition = "TEXT")
     private String stackTrace;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 

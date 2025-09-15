@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -136,8 +137,7 @@ public class CustomerService {
                 response.setPoints(benefit != null ? benefit.getPoints() : 0);
                 response.setCoupons(benefit != null ? benefit.getCoupons() : null);
                 return response;
-            })
-            .collect(Collectors.toList());
+            }).sorted(Comparator.comparing(CustomerBenefitResponse::getName)).toList();
 
     }
 }

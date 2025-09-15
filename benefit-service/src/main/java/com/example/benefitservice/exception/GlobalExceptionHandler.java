@@ -1,63 +1,89 @@
 package com.example.benefitservice.exception;
 
+import com.example.benefitservice.entity.ErrorLog;
+import com.example.benefitservice.repository.ErrorLogRepository;
 import com.example.dto.ApiResponse;
+import com.example.dto.ErrorResponse;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.util.ResponseUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle CommonException
-     */
+    private final ErrorLogRepository errorLogRepository;
+
+
     @ExceptionHandler(CommonException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCommonException(CommonException ex) {
-        log.error("CommonException occurred: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(ex.getCode().getStatus())
-                .body(new ApiResponse<>(ex.getCode().getStatus().value(), ex.getMessage(), null, java.time.LocalDateTime.now()));
-    }
-
-    /**
-     * Handle validation errors from @Valid annotation in controller API
-     * When validation fails, MethodArgumentNotValidException is thrown
-     * Extract message from ex.getBindingResult() and return response
-     * Required dependency: org.springframework.boot:spring-boot-starter-validation
-     * Usage: Add @Valid annotation to DTO parameters in controller methods
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationException(MethodArgumentNotValidException ex) {
-        log.error("Validation error occurred: {}", ex.getMessage(), ex);
-        
-        String errorMessage = "Validation failed: " + ex.getBindingResult().getFieldError().getDefaultMessage();
-        
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> 
-            errors.put(error.getField(), error.getDefaultMessage())
-        );
-        
+    public ResponseEntity<ErrorResponse> handleCommonException(CommonException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)  // 400 Bad Request status code
-                .body(new ApiResponse<>(400, errorMessage, errors, java.time.LocalDateTime.now()));
+                .status(ex.getStatus())
+                .body(new ErrorResponse(ex));
     }
 
-    /**
-     * Handle all other exceptions
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
-        log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse<>(500, "Internal server error", null, java.time.LocalDateTime.now()));
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+
+        String errorMessage = "다음 정보를 입력해주세요: " +
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map(error -> error.getDefaultMessage())
+                        .collect(Collectors.joining(", "));
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)  // 또는 적절한 상태 코드
+                .body(new ErrorResponse(
+                        errorMessage,
+                        "INVALID_PARAMETER",
+                        400,  // 또는 적절한 상태 코드
+                        LocalDateTime.now()
+                ));
+
     }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorResponse> handleThrowable(Throwable ex, HttpServletRequest request) {
+
+        String errorId = UUID.randomUUID().toString();
+
+        log.error("[{}] Internal server error at {} {}", errorId, request.getMethod(), request.getRequestURI(), ex);
+
+        errorLogRepository.save(ErrorLog.builder()
+                .errorId(errorId)
+                .message(ex.getMessage())
+                .code("INTERNAL_SERVER_ERROR")
+                .status(500)
+                .uri(request.getRequestURI())
+                .method(request.getMethod())
+                .stackTrace(ExceptionUtils.getStackTrace(ex))
+                .requestParams(request.getQueryString())
+                .build());
+
+        return ResponseEntity.status(500)
+                .body(new ErrorResponse(
+                        "서버 내부 오류가 발생했습니다. (에러 ID: " + errorId + ")",
+                        "INTERNAL_SERVER_ERROR",
+                        500,
+                        LocalDateTime.now()
+                ));
+    }
+
 }

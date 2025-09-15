@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static com.example.Constant.ServiceConstants.INTERNAL_SERVICE_ERROR_CODE;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -21,13 +23,12 @@ public class ErrorLogService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void internalDeleteErrorLogSave(int storeId, Exception error) {
 
-        String errorCategory = "INTERNAL_SERVICE_ERROR";
         String requestParams = "{\"storeId\": \"" + storeId + "\"}";
 
         ErrorLog errorLog = ErrorLog.builder()
                 .errorId(UUID.randomUUID().toString())
                 .message(error.getMessage())
-                .code(errorCategory)
+                .code(INTERNAL_SERVICE_ERROR_CODE)
                 .status(500)
                 .uri("/api/store/" + storeId)
                 .method("DELETE")
