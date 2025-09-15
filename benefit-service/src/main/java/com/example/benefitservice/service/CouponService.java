@@ -64,9 +64,6 @@ public class CouponService {
 
         couponRepository.getCoupon(storeId,customerId,usedCouponId)
                 .map(coupon -> {
-                    if (coupon.getIsUsed()) {
-                        throw new CommonException(CommonExceptionCode.COUPON_ALREADY_USED);
-                    }
                     coupon.setIsUsed(true);
                     coupon.setUsedDate(LocalDate.now());
                     return couponRepository.save(coupon);
@@ -77,7 +74,7 @@ public class CouponService {
 
     public void rollbackUseCoupon(String usedCouponId, int customerId, Integer storeId) {
 
-        couponRepository.getCoupon(storeId, customerId, usedCouponId)
+        couponRepository.getUsedCoupon(storeId, customerId, usedCouponId)
                 .map(coupon -> {
                     coupon.setIsUsed(false);
                     coupon.setUsedDate(null);
