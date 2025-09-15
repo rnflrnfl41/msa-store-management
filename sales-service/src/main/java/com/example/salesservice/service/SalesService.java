@@ -6,24 +6,30 @@ import com.example.exception.CommonExceptionCode;
 import com.example.salesservice.dto.SalesRegistrationDto;
 import com.example.salesservice.dto.ServiceHistoryDto;
 import com.example.salesservice.dto.ServiceItemDto;
+import com.example.salesservice.entity.ErrorLog;
 import com.example.salesservice.entity.Payment;
 import com.example.salesservice.entity.ServiceItem;
 import com.example.salesservice.entity.Visit;
+import com.example.salesservice.repository.ErrorLogRepository;
 import com.example.salesservice.repository.PaymentRepository;
 import com.example.salesservice.repository.ServiceItemRepository;
 import com.example.salesservice.repository.VisitRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static com.example.Constant.BenefitConstant.BENEFIT_USE_COMPLETE;
+import static com.example.Constant.ServiceConstants.INTERNAL_SERVICE_ERROR_CODE;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +41,8 @@ public class SalesService {
     private final ServiceItemRepository serviceItemRepository;
     private final ModelMapper modelMapper;
     private final BenefitServiceClient benefitServiceClient;
+    private final ErrorLogRepository errorLogRepository;
+    private final RegisterSalesService registerSalesService;
 
     public List<ServiceHistoryDto> getCustomerServiceHistory(Integer customerId, Integer storeId) {
         return visitRepository.findByStoreIdAndCustomerId(storeId, customerId)
@@ -60,6 +68,7 @@ public class SalesService {
 
     public void registerSales(SalesRegistrationDto registrationDto, Integer storeId) {
 
+        //benefit-service에 보낼 parameter
         BenefitUseRequest useRequest = BenefitUseRequest.builder()
                 .usedPoint(registrationDto.getUsedPoint())
                 .usedCouponId(registrationDto.getUsedCouponId())
@@ -70,6 +79,7 @@ public class SalesService {
 
         try{
 
+            //benefit-service에 api 보내는 작업
             String response = benefitServiceClient.usePointCoupon(useRequest,storeId);
 
             if(!response.equals(BENEFIT_USE_COMPLETE)){
@@ -78,7 +88,8 @@ public class SalesService {
 
             benefitUsed = true;
 
-            saveSalesData(registrationDto,storeId);
+            //별도 트랜잭션을 사용 해야하는대 같은 클래스 내의 메서드를 참조할때는 @Transcational이 안되서 별도 서비스로 분리
+            registerSalesService.saveSalesData(registrationDto,storeId);
 
         }catch (Exception e){
 
@@ -87,43 +98,30 @@ public class SalesService {
                     String rollbackResponse = benefitServiceClient.usePointCouponRollback(useRequest, storeId);
                     log.info("혜택 사용 롤백 완료: {}", rollbackResponse);
                 } catch (Exception rollbackException) {
-                    log.error("혜택 사용 롤백 실패: {}", rollbackException.getMessage());
-                    // 심각한 오류 - 관리자 알림 필요
+
+                    log.error("🚨 혜택 사용 롤백 실패 - 데이터 불일치 발생!", rollbackException);
+                    log.error("고객 ID: {}, 상점 ID: {}, 사용된 포인트: {}, 사용된 쿠폰: {}", 
+                            registrationDto.getCustomerId(), storeId, 
+                            registrationDto.getUsedPoint(), registrationDto.getUsedCouponId());
+
+                    errorLogRepository.save(ErrorLog.builder()
+                            .uri("benefit-service usePointCouponRollback fail")
+                            .code(INTERNAL_SERVICE_ERROR_CODE)
+                            .errorId(UUID.randomUUID().toString())
+                            .message(rollbackException.getMessage())
+                            .status(500)
+                            .stackTrace(ExceptionUtils.getStackTrace(rollbackException))
+                            .build()
+                    );
+
                 }
             }
 
-            if (e instanceof CommonException) {
-                throw e; // 이미 CommonException이면 그대로
-            } else {
-                throw new CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "SALES_REGISTRATION_FAILED", e.getMessage());
-            }
+            throw e;
 
         }
 
     }
 
-    @Transactional
-    public void saveSalesData(SalesRegistrationDto registrationDto, Integer storeId) {
-        Visit visit = modelMapper.map(registrationDto, Visit.class);
-        visit.setStoreId(storeId);
-        visitRepository.save(visit);
-
-        paymentRepository.save(Payment.builder()
-                .amount(registrationDto.getFinalServiceAmount())
-                .discount(registrationDto.getDiscountAmount())
-                .paymentMethod(registrationDto.getPaymentMethod())
-                .pointsUsed(registrationDto.getUsedPoint())
-                .visit(visit)
-                .build()
-        );
-
-        registrationDto.getServiceList().stream()
-                .map(s -> ServiceItem.builder()
-                        .serviceName(s.getName())
-                        .price(s.getPrice())
-                        .visit(visit)
-                        .build())
-                .forEach(serviceItemRepository::save);
-    }
 
 }
