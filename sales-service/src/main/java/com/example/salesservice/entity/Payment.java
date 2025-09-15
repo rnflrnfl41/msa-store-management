@@ -38,8 +38,7 @@ public class Payment {
     @Column(name = "points_used")
     private Integer pointsUsed;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
