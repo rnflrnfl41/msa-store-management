@@ -35,6 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CommonException.class)
     public ResponseEntity<ErrorResponse> handleCommonException(CommonException ex) {
+        log.error("CommonException: {}", ex.getMessage());
         return ResponseEntity
                 .status(ex.getStatus())
                 .body(new ErrorResponse(ex));
