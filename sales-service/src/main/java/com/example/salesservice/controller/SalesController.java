@@ -2,6 +2,7 @@ package com.example.salesservice.controller;
 
 import com.example.dto.ApiResponse;
 import com.example.salesservice.dto.SalesRegistrationDto;
+import com.example.salesservice.dto.SalesSummaryResponse;
 import com.example.salesservice.dto.ServiceHistoryDto;
 import com.example.salesservice.service.SalesService;
 import com.example.util.ResponseUtil;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.Constant.HttpHeaderConstants.X_USER_STORE_ID;
@@ -38,6 +40,21 @@ public class SalesController {
         Integer storeId = Integer.parseInt(storeIdHeader);
         salesService.registerSales(registrationDto, storeId);
         return ResponseUtil.created("매출 등록이 완료되었습니다");
+    }
+
+    /**
+     * 요약 데이터 조회 (오늘/이번달 매출)
+     * @param date
+     * @param storeIdHeader
+     * @return
+     */
+    @GetMapping("/summary/{date}")
+    public ResponseEntity<ApiResponse<SalesSummaryResponse>> summarySales(
+            @PathVariable String date,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(salesService.summarySales(date, storeId));
     }
 
 }

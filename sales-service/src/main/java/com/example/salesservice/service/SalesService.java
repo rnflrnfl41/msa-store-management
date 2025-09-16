@@ -3,9 +3,7 @@ package com.example.salesservice.service;
 import com.example.dto.BenefitUseRequest;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
-import com.example.salesservice.dto.SalesRegistrationDto;
-import com.example.salesservice.dto.ServiceHistoryDto;
-import com.example.salesservice.dto.ServiceItemDto;
+import com.example.salesservice.dto.*;
 import com.example.salesservice.entity.ErrorLog;
 import com.example.salesservice.entity.Payment;
 import com.example.salesservice.entity.ServiceItem;
@@ -24,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -124,4 +123,18 @@ public class SalesService {
     }
 
 
+    public SalesSummaryResponse summarySales(String dateStr, Integer storeId) {
+
+        LocalDate localDate = LocalDate.parse(dateStr);
+        int month = localDate.getMonthValue();
+
+        SalesSummary todaySummary = visitRepository.getSummarySalesDate(localDate,storeId);
+        SalesSummary monthSummary = visitRepository.getSummarySalesMonth(month,storeId);
+
+        return SalesSummaryResponse.builder()
+                .today(todaySummary)
+                .month(monthSummary)
+                .build();
+
+    }
 }
