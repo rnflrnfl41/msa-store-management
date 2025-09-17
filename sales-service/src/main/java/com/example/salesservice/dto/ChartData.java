@@ -6,15 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Setter
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesSummary {
+public class ChartData {
 
+    private LocalDate date;
+    
     private long amount;
-
+    
     private long count;
 
 }

@@ -1,6 +1,7 @@
 package com.example.salesservice.controller;
 
 import com.example.dto.ApiResponse;
+import com.example.salesservice.dto.SalesChartResponse;
 import com.example.salesservice.dto.SalesRegistrationDto;
 import com.example.salesservice.dto.SalesSummaryResponse;
 import com.example.salesservice.dto.ServiceHistoryDto;
@@ -55,6 +56,17 @@ public class SalesController {
     ) {
         Integer storeId = Integer.parseInt(storeIdHeader);
         return ResponseUtil.success(salesService.summarySales(date, storeId));
+    }
+
+    @GetMapping("/chart")
+    public ResponseEntity<ApiResponse<SalesChartResponse>> getChartData(
+            @RequestParam String type,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(salesService.getChartData(type,startDate,endDate,storeId));
     }
 
 }
