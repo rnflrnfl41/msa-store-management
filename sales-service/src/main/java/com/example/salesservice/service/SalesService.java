@@ -24,6 +24,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -227,5 +228,34 @@ public class SalesService {
                 .dates(dates)
                 .counts(counts)
                 .build();
+    }
+
+    public List<SalesDataDto> getSalesList(LocalDate date, int page, int limit, Integer storeId) {
+
+        List<SalesDataDto> response = new ArrayList<>();
+
+        return visitRepository.findByVisitDate(date).stream().map(v -> {
+
+            Payment payment = paymentRepository.findByVisit(v)
+                    .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_VISIT_ID));
+
+            int couponDiscountAmount = payment.getDiscount() - payment.getPointsUsed();
+
+            //나머지 추가 해야함
+            SalesDataDto dto = SalesDataDto.builder()
+                    .id(v.getId())
+                    .originalAmount(v.getTotalServiceAmount())
+                    .finalAmount(v.getFinalServiceAmount())
+                    .discountAmount(v.getTotalServiceAmount() - v.getFinalServiceAmount())
+                    .memo(v.getMemo())
+                    .date(v.getVisitDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                    .time(v.getVisitTime().format(DateTimeFormatter.ISO_LOCAL_TIME))
+                    .paymentMethod(payment.getPaymentMethod())
+                    .usedPoints(payment.getPointsUsed())
+                    .build();
+
+            return dto;
+        }).toList();
+
     }
 }

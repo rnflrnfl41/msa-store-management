@@ -1,10 +1,7 @@
 package com.example.salesservice.controller;
 
 import com.example.dto.ApiResponse;
-import com.example.salesservice.dto.SalesChartResponse;
-import com.example.salesservice.dto.SalesRegistrationDto;
-import com.example.salesservice.dto.SalesSummaryResponse;
-import com.example.salesservice.dto.ServiceHistoryDto;
+import com.example.salesservice.dto.*;
 import com.example.salesservice.service.SalesService;
 import com.example.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
@@ -75,6 +72,25 @@ public class SalesController {
     ) {
         Integer storeId = Integer.parseInt(storeIdHeader);
         return ResponseUtil.success(salesService.getChartData(type,startDate,endDate,storeId));
+    }
+
+    /**
+     * 매출 목록 조회
+     * @param date
+     * @param page
+     * @param limit
+     * @param storeIdHeader
+     * @return
+     */
+    @GetMapping("/chart")
+    public ResponseEntity<ApiResponse<List<SalesDataDto>>> getSalesList(
+            @RequestParam LocalDate date,
+            @RequestParam Integer page,
+            @RequestParam Integer limit,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(salesService.getSalesList(date,page,limit,storeId));
     }
 
 }

@@ -49,4 +49,6 @@ public interface VisitRepository extends JpaRepository <Visit, Integer> {
             " order by v.visitDate")
     List<ChartData> getDailyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
 
+    List<Visit> findByVisitDate(LocalDate date);
+
 }
