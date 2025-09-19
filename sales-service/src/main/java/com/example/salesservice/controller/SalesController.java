@@ -58,6 +58,14 @@ public class SalesController {
         return ResponseUtil.success(salesService.summarySales(date, storeId));
     }
 
+    /**
+     * 차트 데이터 조회 (일별/월별 매출)
+     * @param type
+     * @param startDate
+     * @param endDate
+     * @param storeIdHeader
+     * @return
+     */
     @GetMapping("/chart")
     public ResponseEntity<ApiResponse<SalesChartResponse>> getChartData(
             @RequestParam String type,
