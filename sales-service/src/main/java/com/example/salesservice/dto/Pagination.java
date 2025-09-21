@@ -4,17 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Setter
 @Getter
 @Builder
-public class UsedCouponDto {
+public class Pagination {
 
-    private UUID id;
+    private int page;
 
-    private String name;
+    private int total;
 
-    private int discountAmount;
+    private int totalPages;
 
 }

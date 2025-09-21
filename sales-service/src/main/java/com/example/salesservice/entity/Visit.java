@@ -48,6 +48,9 @@ public class Visit {
     @Column(name = "customer_id", nullable = false)
     private Integer customerId;
 
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
+
     @NotNull
     @Column(name = "total_service_amount", nullable = false)
     private Integer totalServiceAmount;

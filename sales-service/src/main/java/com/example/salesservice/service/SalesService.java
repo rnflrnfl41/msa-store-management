@@ -16,6 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -230,32 +234,55 @@ public class SalesService {
                 .build();
     }
 
-    public List<SalesDataDto> getSalesList(LocalDate date, int page, int limit, Integer storeId) {
+    public SalesDataResponse getSalesList(LocalDate date, int page, int limit, Integer storeId) {
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("visitTime").descending());
+        Page<Visit> visitPage = visitRepository.findByVisitDateAndStoreId(date, storeId, pageable);
 
-        List<SalesDataDto> response = new ArrayList<>();
+        List<SalesDataDto> sales = visitPage.getContent()
+                .stream()
+                .map(this::convertToSalesDataDto)
+                .toList();
 
-        return visitRepository.findByVisitDate(date).stream().map(v -> {
+        return SalesDataResponse.builder()
+                .sales(sales)
+                .pagination(createPagination(page, visitPage))
+                .build();
+    }
 
-            Payment payment = paymentRepository.findByVisit(v)
-                    .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_VISIT_ID));
+    private SalesDataDto convertToSalesDataDto(Visit visit) {
+        Payment payment = paymentRepository.findByVisit(visit)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_VISIT_ID));
 
-            int couponDiscountAmount = payment.getDiscount() - payment.getPointsUsed();
+        return SalesDataDto.builder()
+                .id(visit.getId())
+                .originalAmount(visit.getTotalServiceAmount())
+                .finalAmount(visit.getFinalServiceAmount())
+                .discountAmount(visit.getTotalServiceAmount() - visit.getFinalServiceAmount())
+                .memo(visit.getMemo())
+                .date(visit.getVisitDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .time(visit.getVisitTime().format(DateTimeFormatter.ISO_LOCAL_TIME))
+                .paymentMethod(payment.getPaymentMethod())
+                .customerName(visit.getCustomerName())
+                .usedCoupon(createUsedCouponDto(payment))
+                .usedPoints(payment.getPointsUsed())
+                .build();
+    }
 
-            //나머지 추가 해야함
-            SalesDataDto dto = SalesDataDto.builder()
-                    .id(v.getId())
-                    .originalAmount(v.getTotalServiceAmount())
-                    .finalAmount(v.getFinalServiceAmount())
-                    .discountAmount(v.getTotalServiceAmount() - v.getFinalServiceAmount())
-                    .memo(v.getMemo())
-                    .date(v.getVisitDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                    .time(v.getVisitTime().format(DateTimeFormatter.ISO_LOCAL_TIME))
-                    .paymentMethod(payment.getPaymentMethod())
-                    .usedPoints(payment.getPointsUsed())
-                    .build();
+    private UsedCouponDto createUsedCouponDto(Payment payment) {
+        int couponDiscountAmount = payment.getDiscount() - payment.getPointsUsed();
+        
+        return UsedCouponDto.builder()
+                .id(payment.getUsedCouponId())
+                .name(payment.getUsedCouponName())
+                .discountAmount(couponDiscountAmount)
+                .build();
+    }
 
-            return dto;
-        }).toList();
-
+    private Pagination createPagination(int page, Page<Visit> visitPage) {
+        return Pagination.builder()
+                .page(page)
+                .total((int) visitPage.getTotalElements())
+                .totalPages(visitPage.getTotalPages())
+                .build();
     }
 }

@@ -5,11 +5,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -37,6 +40,13 @@ public class Payment {
 
     @Column(name = "points_used")
     private Integer pointsUsed;
+
+    @Column(name = "used_coupon_id")
+    @JdbcTypeCode(Types.CHAR)
+    private UUID usedCouponId;
+
+    @Column(name = "used_coupon_name")
+    private String usedCouponName;
 
     @Column(name = "created_at")
     @CreationTimestamp

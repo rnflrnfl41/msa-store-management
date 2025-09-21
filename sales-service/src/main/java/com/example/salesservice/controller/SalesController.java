@@ -82,8 +82,8 @@ public class SalesController {
      * @param storeIdHeader
      * @return
      */
-    @GetMapping("/chart")
-    public ResponseEntity<ApiResponse<List<SalesDataDto>>> getSalesList(
+    @GetMapping
+    public ResponseEntity<ApiResponse<SalesDataResponse>> getSalesList(
             @RequestParam LocalDate date,
             @RequestParam Integer page,
             @RequestParam Integer limit,
