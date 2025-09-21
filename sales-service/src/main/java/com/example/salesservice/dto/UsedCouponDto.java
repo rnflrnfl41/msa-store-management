@@ -1,15 +1,19 @@
 package com.example.salesservice.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Setter
 @Getter
+@Builder
 public class UsedCouponDto {
 
-    private String id;
+    private UUID id;
 
-    private int name;
+    private String name;
 
     private int discountAmount;
 
