@@ -3,6 +3,8 @@ package com.example.salesservice.repository;
 import com.example.salesservice.dto.ChartData;
 import com.example.salesservice.dto.SalesSummary;
 import com.example.salesservice.entity.Visit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -49,6 +51,6 @@ public interface VisitRepository extends JpaRepository <Visit, Integer> {
             " order by v.visitDate")
     List<ChartData> getDailyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
 
-    List<Visit> findByVisitDate(LocalDate date);
+    Page<Visit> findByVisitDateAndStoreId(LocalDate visitDate, int storeId, Pageable pageable);
 
 }
