@@ -1,7 +1,6 @@
 package com.example.benefitservice.service;
 
 import com.example.benefitservice.entity.PointLog;
-import com.example.dto.BenefitUseRequest;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.benefitservice.entity.PointBalance;
@@ -43,7 +42,7 @@ public class PointService {
     }
 
     @Transactional
-    public void usePoint(int usedPoint, int storeId, int customerId) {
+    public void usePoint(int usedPoint, int customerId, int storeId) {
 
         pointLogRepository.save(PointLog.builder()
                 .customerId(customerId)
@@ -66,7 +65,7 @@ public class PointService {
     }
 
     @Transactional
-    public void rollbackUsePoint(int usedPoint, int storeId, int customerId) {
+    public void rollbackUsePoint(int usedPoint, int customerId, int storeId) {
 
         pointLogRepository.save(PointLog.builder()
                 .customerId(customerId)
