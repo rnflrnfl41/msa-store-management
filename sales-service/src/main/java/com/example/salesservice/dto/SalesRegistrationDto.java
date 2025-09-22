@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalTime;
 import java.util.List;
 
 @Setter
@@ -13,7 +13,11 @@ public class SalesRegistrationDto {
 
     private int customerId;
 
+    private String customerName;
+
     private LocalDate visitDate;
+
+    private LocalTime visitTime;
 
     private int totalServiceAmount;
 
@@ -26,6 +30,8 @@ public class SalesRegistrationDto {
     private String paymentMethod;
 
     private String usedCouponId;
+
+    private String usedCouponName;
 
     private int usedPoint;
 
