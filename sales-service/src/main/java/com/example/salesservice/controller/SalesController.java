@@ -20,6 +20,12 @@ public class SalesController {
 
     private final SalesService salesService;
 
+    /**
+     *
+     * @param customerId
+     * @param storeIdHeader
+     * @return
+     */
     @GetMapping("/{customerId}/history")
     public ResponseEntity<ApiResponse<List<ServiceHistoryDto>>> getCustomerServiceHistory(
             @PathVariable Integer customerId,
@@ -30,6 +36,12 @@ public class SalesController {
         return ResponseUtil.success(historyDtoList);
     }
 
+    /**
+     * 매출 등록
+     * @param registrationDto
+     * @param storeIdHeader
+     * @return
+     */
     @PostMapping("/registration")
     public ResponseEntity<ApiResponse<String>> registerSales(
             @RequestBody SalesRegistrationDto registrationDto,
@@ -91,6 +103,22 @@ public class SalesController {
     ) {
         Integer storeId = Integer.parseInt(storeIdHeader);
         return ResponseUtil.success(salesService.getSalesList(date,page,limit,storeId));
+    }
+
+    /**
+     * 매출 삭제
+     * @param visitId
+     * @param storeIdHeader
+     * @return
+     */
+    @DeleteMapping("{visitId}")
+    public ResponseEntity<ApiResponse<String>> deleteSales(
+            @PathVariable int visitId,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        salesService.deleteSales(visitId,storeId);
+        return ResponseUtil.success("매출 삭제 완료");
     }
 
 }
