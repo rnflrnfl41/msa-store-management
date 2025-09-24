@@ -6,11 +6,9 @@ import com.example.exception.CommonExceptionCode;
 import com.example.salesservice.dto.*;
 import com.example.salesservice.entity.ErrorLog;
 import com.example.salesservice.entity.Payment;
-import com.example.salesservice.entity.ServiceItem;
 import com.example.salesservice.entity.Visit;
 import com.example.salesservice.repository.ErrorLogRepository;
 import com.example.salesservice.repository.PaymentRepository;
-import com.example.salesservice.repository.ServiceItemRepository;
 import com.example.salesservice.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -34,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.example.Constant.BenefitConstant.BENEFIT_USE_COMPLETE;
 import static com.example.Constant.ServiceConstants.INTERNAL_SERVICE_ERROR_CODE;
@@ -46,7 +39,6 @@ public class SalesService {
 
     private final PaymentRepository paymentRepository;
     private final VisitRepository visitRepository;
-    private final ServiceItemRepository serviceItemRepository;
     private final ModelMapper modelMapper;
     private final BenefitServiceClient benefitServiceClient;
     private final ErrorLogRepository errorLogRepository;
@@ -102,27 +94,7 @@ public class SalesService {
         }catch (Exception e){
 
             if (benefitUsed) {
-                try {
-                    String rollbackResponse = benefitServiceClient.usePointCouponRollback(useRequest, storeId);
-                    log.info("혜택 사용 롤백 완료: {}", rollbackResponse);
-                } catch (Exception rollbackException) {
-
-                    log.error("🚨 혜택 사용 롤백 실패 - 데이터 불일치 발생!", rollbackException);
-                    log.error("고객 ID: {}, 상점 ID: {}, 사용된 포인트: {}, 사용된 쿠폰: {}", 
-                            registrationDto.getCustomerId(), storeId, 
-                            registrationDto.getUsedPoint(), registrationDto.getUsedCouponId());
-
-                    errorLogRepository.save(ErrorLog.builder()
-                            .uri("benefit-service usePointCouponRollback fail")
-                            .code(INTERNAL_SERVICE_ERROR_CODE)
-                            .errorId(UUID.randomUUID().toString())
-                            .message(rollbackException.getMessage())
-                            .status(500)
-                            .stackTrace(ExceptionUtils.getStackTrace(rollbackException))
-                            .build()
-                    );
-
-                }
+                rollbackBenefitUsage(useRequest, storeId, "매출 등록");
             }
 
             throw e;
@@ -148,7 +120,7 @@ public class SalesService {
     }
 
     public SalesChartResponse getChartData(String type, LocalDate startDate, LocalDate endDate, Integer storeId) {
-        
+
         if ("monthly".equals(type)) {
             return getMonthlyChartData(startDate, endDate, storeId);
         } else if ("daily".equals(type)) {
@@ -160,7 +132,7 @@ public class SalesService {
 
     private SalesChartResponse getMonthlyChartData(LocalDate startDate, LocalDate endDate, Integer storeId) {
         List<ChartData> chartDataList = visitRepository.getMonthlyChartDataByPeriod(startDate, endDate, storeId);
-        
+
         // 데이터를 Map으로 변환 (년월을 키로) - 성능 최적화
         Map<YearMonth, Long> dataMap = chartDataList.stream()
                 .collect(Collectors.toMap(
@@ -169,7 +141,7 @@ public class SalesService {
                     Long::sum, // 중복 키 처리 (같은 월에 여러 데이터가 있을 경우)
                     java.util.LinkedHashMap::new // 순서 보장
                 ));
-        
+
         // count도 Map으로 변환
         Map<YearMonth, Long> countMap = chartDataList.stream()
                 .collect(Collectors.toMap(
@@ -178,15 +150,15 @@ public class SalesService {
                     Long::sum, // 중복 키 처리
                     java.util.LinkedHashMap::new // 순서 보장
                 ));
-        
+
         List<Long> data = new ArrayList<>();
         List<LocalDate> dates = new ArrayList<>();
         List<Long> counts = new ArrayList<>();
-        
+
         // 월별로 모든 날짜를 생성하고 빈 날짜는 0으로 채움
         YearMonth current = YearMonth.from(startDate);
         YearMonth end = YearMonth.from(endDate);
-        
+
         while (!current.isAfter(end)) {
             LocalDate firstDayOfMonth = current.atDay(1);
             dates.add(firstDayOfMonth);
@@ -194,7 +166,7 @@ public class SalesService {
             counts.add(countMap.getOrDefault(current, 0L));
             current = current.plusMonths(1);
         }
-        
+
         return SalesChartResponse.builder()
                 .data(data)
                 .dates(dates)
@@ -204,29 +176,29 @@ public class SalesService {
 
     private SalesChartResponse getDailyChartData(LocalDate startDate, LocalDate endDate, Integer storeId) {
         List<ChartData> chartDataList = visitRepository.getDailyChartDataByPeriod(startDate, endDate, storeId);
-        
+
         // 데이터를 Map으로 변환 (날짜를 키로)
         Map<LocalDate, Long> dataMap = chartDataList.stream()
                 .collect(Collectors.toMap(ChartData::getDate, ChartData::getAmount));
-        
+
         // count도 Map으로 변환
         Map<LocalDate, Long> countMap = chartDataList.stream()
                 .collect(Collectors.toMap(ChartData::getDate, ChartData::getCount));
-        
+
         List<Long> data = new ArrayList<>();
         List<LocalDate> dates = new ArrayList<>();
         List<Long> counts = new ArrayList<>();
-        
+
         // 일별로 모든 날짜를 생성하고 빈 날짜는 0으로 채움
         LocalDate current = startDate;
-        
+
         while (!current.isAfter(endDate)) {
             dates.add(current);
             data.add(dataMap.getOrDefault(current, 0L));
             counts.add(countMap.getOrDefault(current, 0L));
             current = current.plusDays(1);
         }
-        
+
         return SalesChartResponse.builder()
                 .data(data)
                 .dates(dates)
@@ -270,7 +242,7 @@ public class SalesService {
 
     private UsedCouponDto createUsedCouponDto(Payment payment) {
         int couponDiscountAmount = payment.getDiscount() - payment.getPointsUsed();
-        
+
         return UsedCouponDto.builder()
                 .id(payment.getUsedCouponId())
                 .name(payment.getUsedCouponName())
@@ -284,5 +256,51 @@ public class SalesService {
                 .total((int) visitPage.getTotalElements())
                 .totalPages(visitPage.getTotalPages())
                 .build();
+    }
+
+    /**
+     * 혜택 사용 롤백을 수행하는 공통 메서드
+     */
+    private void rollbackBenefitUsage(BenefitUseRequest useRequest, Integer storeId, String context) {
+        try {
+            String rollbackResponse = benefitServiceClient.usePointCouponRollback(useRequest, storeId);
+            log.info("혜택 사용 롤백 완료 ({}): {}", context, rollbackResponse);
+        } catch (Exception rollbackException) {
+            log.error("🚨 혜택 사용 롤백 실패 ({}) - 데이터 불일치 발생!", context, rollbackException);
+            log.error("고객 ID: {}, 상점 ID: {}, 사용된 포인트: {}, 사용된 쿠폰: {}",
+                    useRequest.getCustomerId(), storeId,
+                    useRequest.getUsedPoint(), useRequest.getUsedCouponId());
+
+            errorLogRepository.save(ErrorLog.builder()
+                    .uri("benefit-service usePointCouponRollback fail")
+                    .code(INTERNAL_SERVICE_ERROR_CODE)
+                    .errorId(UUID.randomUUID().toString())
+                    .message(rollbackException.getMessage())
+                    .status(500)
+                    .stackTrace(ExceptionUtils.getStackTrace(rollbackException))
+                    .build()
+            );
+        }
+    }
+
+    public void deleteSales(int visitId, Integer storeId) {
+        Visit visit = visitRepository.findByIdAndStoreId(visitId, storeId)
+                .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_VISIT_ID));
+
+        //사용된 포인트나 쿠폰이 있을 시
+        if(visit.getTotalServiceAmount() != visit.getFinalServiceAmount()){
+            Payment payment = paymentRepository.findByVisit(visit)
+                    .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_PAYMENT));
+
+            BenefitUseRequest useRequest = BenefitUseRequest.builder()
+                    .usedPoint(payment.getPointsUsed())
+                    .usedCouponId(payment.getUsedCouponId() == null ? "" : payment.getUsedCouponId().toString())
+                    .customerId(visit.getCustomerId())
+                    .build();
+
+            rollbackBenefitUsage(useRequest, storeId, "매출 삭제");
+        }
+
+        visitRepository.delete(visit);
     }
 }
