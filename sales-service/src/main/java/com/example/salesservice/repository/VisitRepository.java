@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface VisitRepository extends JpaRepository <Visit, Integer> {
 
@@ -53,4 +54,5 @@ public interface VisitRepository extends JpaRepository <Visit, Integer> {
 
     Page<Visit> findByVisitDateAndStoreId(LocalDate visitDate, int storeId, Pageable pageable);
 
+    Optional<Visit> findByIdAndStoreId(int visitId, Integer storeId);
 }

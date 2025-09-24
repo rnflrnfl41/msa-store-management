@@ -44,6 +44,8 @@ public enum CommonExceptionCode {
 
     NO_COUPON(HttpStatus.NOT_FOUND, "해당 쿠폰을 찾을 수 없습니다."),
 
+    NO_PAYMENT(HttpStatus.NOT_FOUND, "결재 내역을 찾을 수 없습니다."),
+
     NO_VISIT_ID(HttpStatus.NOT_FOUND, "해당 아이디를 가진 매출 기록을 찾을 수 없습니다."),
 
     COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 사용된 쿠폰입니다."),
