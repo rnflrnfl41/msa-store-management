@@ -9,6 +9,7 @@ import com.example.salesservice.entity.Payment;
 import com.example.salesservice.entity.Visit;
 import com.example.salesservice.repository.ErrorLogRepository;
 import com.example.salesservice.repository.PaymentRepository;
+import com.example.salesservice.repository.ServiceItemRepository;
 import com.example.salesservice.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -43,6 +45,7 @@ public class SalesService {
     private final BenefitServiceClient benefitServiceClient;
     private final ErrorLogRepository errorLogRepository;
     private final RegisterSalesService registerSalesService;
+    private final ServiceItemRepository serviceItemRepository;
 
     public List<ServiceHistoryDto> getCustomerServiceHistory(Integer customerId, Integer storeId) {
         return visitRepository.findByStoreIdAndCustomerId(storeId, customerId)
@@ -283,6 +286,7 @@ public class SalesService {
         }
     }
 
+    @Transactional
     public void deleteSales(int visitId, Integer storeId) {
         Visit visit = visitRepository.findByIdAndStoreId(visitId, storeId)
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_VISIT_ID));
@@ -301,6 +305,8 @@ public class SalesService {
             rollbackBenefitUsage(useRequest, storeId, "매출 삭제");
         }
 
+        paymentRepository.deleteByVisit(visit);
+        serviceItemRepository.deleteByVisit(visit);
         visitRepository.delete(visit);
     }
 }
