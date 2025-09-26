@@ -46,6 +46,9 @@ public class Coupon {
     @Column(name = "customer_id", nullable = false)
     private int customerId;
 
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
+
     @Column(name = "store_id", nullable = false)
     private int storeId;
 }
