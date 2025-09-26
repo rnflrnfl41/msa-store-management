@@ -1,5 +1,6 @@
 package com.example.benefitservice.controller;
 
+import com.example.benefitservice.dto.CouponDto;
 import com.example.dto.ApiResponse;
 import com.example.dto.BenefitServiceBenefitResponse;
 import com.example.benefitservice.dto.BenefitResponse;
@@ -80,6 +81,19 @@ public class BenefitController {
                 String.format("포인트 및 쿠폰 롤백 완료 - 포인트: %d, 쿠폰ID: %s",
                 request.getUsedPoint(), request.getUsedCouponId())
         );
+    }
+
+    /**
+     * 모든 쿠폰 조회
+     * @param storeIdHeader
+     * @return
+     */
+    @GetMapping("/coupon/all")
+    public ResponseEntity<ApiResponse<List<CouponDto>>> getCustomerCouponListBatch(
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(benefitService.getAllCouponList(storeId));
     }
 
 }

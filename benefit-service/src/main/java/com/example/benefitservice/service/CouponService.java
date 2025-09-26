@@ -39,6 +39,8 @@ public class CouponService {
                 .expiryDate(coupon.getExpiryDate())
                 .used(coupon.getIsUsed() != null ? coupon.getIsUsed() : false)
                 .usedDate(coupon.getUsedDate())
+                .customerId(coupon.getCustomerId())
+                .customerName(coupon.getCustomerName())
                 .build();
     }
 
@@ -81,6 +83,16 @@ public class CouponService {
                     return couponRepository.save(coupon);
                 })
                 .orElseThrow(() -> new CommonException(CommonExceptionCode.NO_COUPON));
+
+    }
+
+    public  List<CouponDto> getAllCouponList(Integer storeId) {
+
+        List<Coupon> couponList = couponRepository.findByStoreId(storeId);
+
+        return couponList.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
 
     }
 

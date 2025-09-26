@@ -27,5 +27,9 @@ public class CouponDto {
 
     private LocalDate usedDate;
 
+    private int customerId;
+
+    private String customerName;
+
 
 }
