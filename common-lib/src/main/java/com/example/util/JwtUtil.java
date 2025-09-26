@@ -29,8 +29,8 @@ public class JwtUtil {
         Date validity = new Date(now.getTime() + TOKEN_VALID_TIME);
 
         return Jwts.builder()
-                .setSubject(subject)
                 .setClaims(claims)
+                .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, decodedSecretKey)
