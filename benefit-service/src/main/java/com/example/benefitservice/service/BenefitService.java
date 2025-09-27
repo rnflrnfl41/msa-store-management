@@ -7,6 +7,7 @@ import com.example.dto.CustomerCoupon;
 import com.example.benefitservice.dto.CouponDto;
 import com.example.benefitservice.dto.BenefitResponse;
 import com.example.exception.CommonException;
+import com.example.exception.CommonExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.example.Constant.BenefitConstant.BENEFIT_USE_COMPLETE;
@@ -97,5 +99,13 @@ public class BenefitService {
 
     public List<CouponDto> getCustomerCouponList(Integer storeId, Integer customerId) {
         return couponService.getCustomerCouponList(storeId,customerId);
+    }
+
+    public void deleteCoupon(Integer storeId, String couponId) {
+        if(!isValidUUID(couponId)){
+            throw new CommonException(CommonExceptionCode.NO_COUPON);
+        }
+        UUID  uuid = UUID.fromString(couponId);
+        couponService.deleteCoupon(storeId, uuid);
     }
 }
