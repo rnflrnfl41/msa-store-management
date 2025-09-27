@@ -94,4 +94,8 @@ public class BenefitService {
     public List<CouponDto> getAllCouponList(int storeId) {
         return couponService.getAllCouponList(storeId);
     }
+
+    public List<CouponDto> getCustomerCouponList(Integer storeId, Integer customerId) {
+        return couponService.getCustomerCouponList(storeId,customerId);
+    }
 }
