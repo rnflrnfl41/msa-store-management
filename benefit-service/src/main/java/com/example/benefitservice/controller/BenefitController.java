@@ -1,6 +1,7 @@
 package com.example.benefitservice.controller;
 
 import com.example.benefitservice.dto.CouponDto;
+import com.example.benefitservice.dto.CouponRegistrationDto;
 import com.example.dto.ApiResponse;
 import com.example.dto.BenefitServiceBenefitResponse;
 import com.example.benefitservice.dto.BenefitResponse;
@@ -85,6 +86,7 @@ public class BenefitController {
 
     /**
      * 모든 쿠폰 조회
+     * GET /api/benefit/coupon/all
      * @param storeIdHeader
      * @return
      */
@@ -96,6 +98,13 @@ public class BenefitController {
         return ResponseUtil.success(benefitService.getAllCouponList(storeId));
     }
 
+    /**
+     * 고객별 쿠폰 조회
+     * GET /api/benefit/coupon/{customerId}
+     * @param customerId
+     * @param storeIdHeader
+     * @return
+     */
     @GetMapping("/coupon/{customerId}")
     public ResponseEntity<ApiResponse<List<CouponDto>>> getCustomerCouponList(
             @PathVariable Integer customerId,
@@ -105,6 +114,23 @@ public class BenefitController {
         return ResponseUtil.success(benefitService.getCustomerCouponList(storeId, customerId));
     }
 
+    @PostMapping("/coupon")
+    public ResponseEntity<ApiResponse<String>> createCoupon(
+            @RequestBody CouponRegistrationDto  couponDto,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        benefitService.createCoupon(storeId, couponDto);
+        return ResponseUtil.created("쿠폰 생성 완료");
+    }
+
+    /**
+     * 쿠폰 삭제
+     * DELETE /api/benefit/coupon/{couponId}
+     * @param couponId
+     * @param storeIdHeader
+     * @return
+     */
     @DeleteMapping("coupon/{couponId}")
     public ResponseEntity<ApiResponse<String>> deleteCoupon(
             @PathVariable String couponId,
@@ -114,5 +140,6 @@ public class BenefitController {
         benefitService.deleteCoupon(storeId, couponId);
         return ResponseUtil.success("쿠폰 삭제 완료");
     }
+
 
 }
