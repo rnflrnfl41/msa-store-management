@@ -85,6 +85,7 @@ public class BenefitController {
 
     /**
      * 모든 쿠폰 조회
+     * GET /api/benefit/coupon/all
      * @param storeIdHeader
      * @return
      */
@@ -96,6 +97,13 @@ public class BenefitController {
         return ResponseUtil.success(benefitService.getAllCouponList(storeId));
     }
 
+    /**
+     * 고객별 쿠폰 조회
+     * GET /api/benefit/coupon/{customerId}
+     * @param customerId
+     * @param storeIdHeader
+     * @return
+     */
     @GetMapping("/coupon/{customerId}")
     public ResponseEntity<ApiResponse<List<CouponDto>>> getCustomerCouponList(
             @PathVariable Integer customerId,
@@ -105,6 +113,13 @@ public class BenefitController {
         return ResponseUtil.success(benefitService.getCustomerCouponList(storeId, customerId));
     }
 
+    /**
+     * 쿠폰 삭제
+     * DELETE /api/benefit/coupon/{couponId}
+     * @param couponId
+     * @param storeIdHeader
+     * @return
+     */
     @DeleteMapping("coupon/{couponId}")
     public ResponseEntity<ApiResponse<String>> deleteCoupon(
             @PathVariable String couponId,
@@ -114,5 +129,6 @@ public class BenefitController {
         benefitService.deleteCoupon(storeId, couponId);
         return ResponseUtil.success("쿠폰 삭제 완료");
     }
+
 
 }
