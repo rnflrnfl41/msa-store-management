@@ -1,6 +1,7 @@
 package com.example.benefitservice.controller;
 
 import com.example.benefitservice.dto.CouponDto;
+import com.example.benefitservice.dto.CouponRegistrationDto;
 import com.example.dto.ApiResponse;
 import com.example.dto.BenefitServiceBenefitResponse;
 import com.example.benefitservice.dto.BenefitResponse;
@@ -111,6 +112,16 @@ public class BenefitController {
     ) {
         Integer storeId = Integer.parseInt(storeIdHeader);
         return ResponseUtil.success(benefitService.getCustomerCouponList(storeId, customerId));
+    }
+
+    @PostMapping("/coupon")
+    public ResponseEntity<ApiResponse<String>> createCoupon(
+            @RequestBody CouponRegistrationDto  couponDto,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        benefitService.createCoupon(storeId, couponDto);
+        return ResponseUtil.created("쿠폰 생성 완료");
     }
 
     /**

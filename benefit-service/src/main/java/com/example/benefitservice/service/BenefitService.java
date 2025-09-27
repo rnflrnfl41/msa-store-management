@@ -1,6 +1,7 @@
 package com.example.benefitservice.service;
 
 import com.example.Constant.BenefitConstant;
+import com.example.benefitservice.dto.CouponRegistrationDto;
 import com.example.dto.BenefitServiceBenefitResponse;
 import com.example.dto.BenefitUseRequest;
 import com.example.dto.CustomerCoupon;
@@ -107,5 +108,9 @@ public class BenefitService {
         }
         UUID  uuid = UUID.fromString(couponId);
         couponService.deleteCoupon(storeId, uuid);
+    }
+
+    public void createCoupon(Integer storeId, CouponRegistrationDto couponDto) {
+        couponService.createCoupon(storeId, couponDto);
     }
 }
