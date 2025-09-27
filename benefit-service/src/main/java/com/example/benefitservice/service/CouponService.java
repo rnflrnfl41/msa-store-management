@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,4 +97,7 @@ public class CouponService {
 
     }
 
+    public void deleteCoupon(Integer storeId, UUID couponId) {
+        couponRepository.deleteByIdAndStoreId(couponId,storeId);
+    }
 }
