@@ -96,4 +96,23 @@ public class BenefitController {
         return ResponseUtil.success(benefitService.getAllCouponList(storeId));
     }
 
+    @GetMapping("/coupon/{customerId}")
+    public ResponseEntity<ApiResponse<List<CouponDto>>> getCustomerCouponList(
+            @PathVariable Integer customerId,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(benefitService.getCustomerCouponList(storeId, customerId));
+    }
+
+    @DeleteMapping("coupon/{couponId}")
+    public ResponseEntity<ApiResponse<String>> deleteCoupon(
+            @PathVariable String couponId,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        benefitService.deleteCoupon(storeId, couponId);
+        return ResponseUtil.success("쿠폰 삭제 완료");
+    }
+
 }

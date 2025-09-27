@@ -31,4 +31,6 @@ public interface CouponRepository extends JpaRepository <Coupon, UUID> {
     Optional<Coupon> getUsedCoupon(int storeId, int customerId, String couponId);
 
     List<Coupon> findByStoreId(Integer storeId);
+
+    void deleteByIdAndStoreId(UUID id,int storeId);
 }
