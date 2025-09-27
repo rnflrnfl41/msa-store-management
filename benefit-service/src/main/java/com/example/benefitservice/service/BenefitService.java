@@ -102,6 +102,7 @@ public class BenefitService {
         return couponService.getCustomerCouponList(storeId,customerId);
     }
 
+    @Transactional
     public void deleteCoupon(Integer storeId, String couponId) {
         if(!isValidUUID(couponId)){
             throw new CommonException(CommonExceptionCode.NO_COUPON);
