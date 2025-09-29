@@ -100,7 +100,7 @@ public class CouponService {
 
     }
 
-    public void deleteCoupon(Integer storeId, UUID couponId) {
+    public void deleteCoupon(Integer storeId, String couponId) {
         couponRepository.deleteByIdAndStoreId(couponId,storeId);
     }
 
