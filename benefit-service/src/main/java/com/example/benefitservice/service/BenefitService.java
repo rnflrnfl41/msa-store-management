@@ -107,8 +107,8 @@ public class BenefitService {
         if(!isValidUUID(couponId)){
             throw new CommonException(CommonExceptionCode.NO_COUPON);
         }
-        UUID  uuid = UUID.fromString(couponId);
-        couponService.deleteCoupon(storeId, uuid);
+
+        couponService.deleteCoupon(storeId, couponId);
     }
 
     public void createCoupon(Integer storeId, CouponRegistrationDto couponDto) {
