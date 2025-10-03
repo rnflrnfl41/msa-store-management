@@ -1,4 +1,4 @@
-package com.example.expenseservice.dto;
+package com.example.expenseservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -24,16 +24,19 @@ public class Expense {
     @Column(name = "store_id", nullable = false)
     private Integer storeId;
 
+    @Column(name = "category_name")
+    private String categoryName;
+
     @NotNull
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
+    @Column(name = "memo", length = Integer.MAX_VALUE)
+    private String memo;
 
     @NotNull
-    @Column(name = "spent_at", nullable = false)
-    private LocalDate spentAt;
+    @Column(name = "expense_date", nullable = false)
+    private LocalDate expenseDate;
 
     @Column(name = "created_at")
     @CreationTimestamp
