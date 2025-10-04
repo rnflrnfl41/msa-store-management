@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Getter
 public class ExpenseData {
 
-    private int id;
+    private Integer id;
 
     private int amount;
 

@@ -9,7 +9,6 @@ import com.example.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,6 +75,12 @@ public class ExpenseController {
         return ResponseUtil.success(expenseService.getChartData(type,startDate,endDate,storeId));
     }
 
+    /**
+     * 지출 삭제
+     * @param expenseId
+     * @param storeIdHeader
+     * @return
+     */
     @DeleteMapping("{expenseId}")
     public ResponseEntity<ApiResponse<String>> deleteExpense(
             @PathVariable int expenseId,
@@ -84,6 +89,16 @@ public class ExpenseController {
         Integer storeId = Integer.parseInt(storeIdHeader);
         expenseService.deleteExpense(expenseId,storeId);
         return ResponseUtil.success("매출 삭제 완료");
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<String>> registerExpense(
+            @RequestBody ExpenseData expenseData,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        expenseService.registerExpense(expenseData, storeId);
+        return ResponseUtil.created("지출 등록이 완료되었습니다");
     }
 
 }

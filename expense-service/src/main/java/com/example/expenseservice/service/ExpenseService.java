@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -57,7 +58,14 @@ public class ExpenseService {
 
     }
 
+    @Transactional
     public void deleteExpense(int expenseId, Integer storeId) {
         expenseRepository.deleteByIdAndStoreId(expenseId,storeId);
+    }
+
+    public void registerExpense(ExpenseData expenseData, Integer storeId) {
+        Expense expense = modelMapper.map(expenseData, Expense.class);
+        expense.setStoreId(storeId);
+        expenseRepository.save(expense);
     }
 }
