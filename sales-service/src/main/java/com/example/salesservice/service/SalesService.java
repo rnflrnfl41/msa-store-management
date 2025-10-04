@@ -1,6 +1,8 @@
 package com.example.salesservice.service;
 
 import com.example.dto.BenefitUseRequest;
+import com.example.dto.FinancialSummary;
+import com.example.dto.FinancialSummaryResponse;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.salesservice.dto.*;
@@ -107,15 +109,15 @@ public class SalesService {
     }
 
 
-    public SalesSummaryResponse summarySales(String dateStr, Integer storeId) {
+    public FinancialSummaryResponse summarySales(String dateStr, Integer storeId) {
 
         LocalDate localDate = LocalDate.parse(dateStr);
         int month = localDate.getMonthValue();
 
-        SalesSummary todaySummary = visitRepository.getSummarySalesDate(localDate,storeId);
-        SalesSummary monthSummary = visitRepository.getSummarySalesMonth(month,storeId);
+        FinancialSummary todaySummary = visitRepository.getSummarySalesDate(localDate,storeId);
+        FinancialSummary monthSummary = visitRepository.getSummarySalesMonth(month,storeId);
 
-        return SalesSummaryResponse.builder()
+        return FinancialSummaryResponse.builder()
                 .today(todaySummary)
                 .month(monthSummary)
                 .build();

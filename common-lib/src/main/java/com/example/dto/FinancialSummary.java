@@ -1,4 +1,4 @@
-package com.example.salesservice.dto;
+package com.example.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesSummary {
+public class FinancialSummary {
 
     private long amount;
 
