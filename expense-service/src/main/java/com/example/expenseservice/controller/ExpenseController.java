@@ -76,4 +76,14 @@ public class ExpenseController {
         return ResponseUtil.success(expenseService.getChartData(type,startDate,endDate,storeId));
     }
 
+    @DeleteMapping("{expenseId}")
+    public ResponseEntity<ApiResponse<String>> deleteExpense(
+            @PathVariable int expenseId,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        expenseService.deleteExpense(expenseId,storeId);
+        return ResponseUtil.success("매출 삭제 완료");
+    }
+
 }

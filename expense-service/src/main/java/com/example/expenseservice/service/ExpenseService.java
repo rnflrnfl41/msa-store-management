@@ -56,4 +56,8 @@ public class ExpenseService {
         }
 
     }
+
+    public void deleteExpense(int expenseId, Integer storeId) {
+        expenseRepository.deleteByIdAndStoreId(expenseId,storeId);
+    }
 }

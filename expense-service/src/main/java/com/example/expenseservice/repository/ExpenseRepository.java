@@ -52,4 +52,6 @@ public interface ExpenseRepository extends JpaRepository <Expense, Integer> {
             " group by e.expenseDate " +
             " order by e.expenseDate")
     List<FinancialChartData> getDailyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
+
+    void deleteByIdAndStoreId(int expenseId, Integer storeId);
 }
