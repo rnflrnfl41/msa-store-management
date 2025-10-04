@@ -1,10 +1,13 @@
 package com.example.expenseservice.service;
 
+import com.example.dto.FinancialChartData;
+import com.example.dto.FinancialChartDto;
 import com.example.dto.FinancialSummary;
 import com.example.dto.FinancialSummaryResponse;
 import com.example.expenseservice.dto.ExpenseData;
 import com.example.expenseservice.entity.Expense;
 import com.example.expenseservice.repository.ExpenseRepository;
+import com.example.util.ChartUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +40,20 @@ public class ExpenseService {
                 .today(todaySummary)
                 .month(monthSummary)
                 .build();
+
+    }
+
+    public FinancialChartDto getChartData(String type, LocalDate startDate, LocalDate endDate, Integer storeId) {
+
+        if ("monthly".equals(type)) {
+            List<FinancialChartData> chartDataList = expenseRepository.getMonthlyChartDataByPeriod(startDate, endDate, storeId);
+            return ChartUtil.getMonthlyChartData(chartDataList, startDate, endDate);
+        } else if ("daily".equals(type)) {
+            List<FinancialChartData> chartDataList = expenseRepository.getDailyChartDataByPeriod(startDate, endDate, storeId);
+            return ChartUtil.getDailyChartData(chartDataList, startDate, endDate);
+        } else {
+            throw new IllegalArgumentException("Invalid chart type: " + type);
+        }
 
     }
 }

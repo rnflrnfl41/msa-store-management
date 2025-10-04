@@ -1,6 +1,7 @@
 package com.example.expenseservice.controller;
 
 import com.example.dto.ApiResponse;
+import com.example.dto.FinancialChartDto;
 import com.example.dto.FinancialSummaryResponse;
 import com.example.expenseservice.dto.ExpenseData;
 import com.example.expenseservice.service.ExpenseService;
@@ -54,6 +55,25 @@ public class ExpenseController {
     ) {
         Integer storeId = Integer.parseInt(storeIdHeader);
         return ResponseUtil.success(expenseService.summarySales(date, storeId));
+    }
+
+    /**
+     * 차트 데이터 조회 (일별/월별 지출)
+     * @param type
+     * @param startDate
+     * @param endDate
+     * @param storeIdHeader
+     * @return
+     */
+    @GetMapping("/chart")
+    public ResponseEntity<ApiResponse<FinancialChartDto>> getChartData(
+            @RequestParam String type,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(expenseService.getChartData(type,startDate,endDate,storeId));
     }
 
 }

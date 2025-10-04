@@ -3,7 +3,7 @@ package com.example.expenseservice.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Setter
 @Getter
@@ -17,6 +17,6 @@ public class ExpenseData {
 
     private String memo;
 
-    private Date expenseDate;
+    private LocalDate expenseDate;
 
 }
