@@ -19,8 +19,8 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ModelMapper modelMapper;
 
-    public Page<ExpenseData> getExpenseListByDate(LocalDate date, Pageable pageable) {
-        Page<Expense> expenseList = expenseRepository.findByExpenseDateOrderById(date, pageable);
+    public Page<ExpenseData> getExpenseListByDate(LocalDate date, Pageable pageable, int storeId) {
+        Page<Expense> expenseList = expenseRepository.findByExpenseDateAndStoreIdOrderById(date, storeId, pageable);
         return expenseList.map(expense -> modelMapper.map(expense, ExpenseData.class));
     }
 }

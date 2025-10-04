@@ -11,6 +11,6 @@ import java.time.LocalDate;
 
 public interface ExpenseRepository extends JpaRepository <Expense, Integer> {
 
-    Page<Expense> findByExpenseDateOrderById(LocalDate expenseDate, Pageable pageable);
+    Page<Expense> findByExpenseDateAndStoreIdOrderById(LocalDate expenseDate, int storeId, Pageable pageable);
 
 }
