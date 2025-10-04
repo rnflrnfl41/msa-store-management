@@ -1,6 +1,8 @@
 package com.example.salesservice.controller;
 
 import com.example.dto.ApiResponse;
+import com.example.dto.FinancialSummaryResponse;
+import com.example.dto.FinancialChartDto;
 import com.example.salesservice.dto.*;
 import com.example.salesservice.service.SalesService;
 import com.example.util.ResponseUtil;
@@ -59,7 +61,7 @@ public class SalesController {
      * @return
      */
     @GetMapping("/summary/{date}")
-    public ResponseEntity<ApiResponse<SalesSummaryResponse>> summarySales(
+    public ResponseEntity<ApiResponse<FinancialSummaryResponse>> summarySales(
             @PathVariable String date,
             @RequestHeader(X_USER_STORE_ID) String storeIdHeader
     ) {
@@ -76,7 +78,7 @@ public class SalesController {
      * @return
      */
     @GetMapping("/chart")
-    public ResponseEntity<ApiResponse<SalesChartResponse>> getChartData(
+    public ResponseEntity<ApiResponse<FinancialChartDto>> getChartData(
             @RequestParam String type,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate,

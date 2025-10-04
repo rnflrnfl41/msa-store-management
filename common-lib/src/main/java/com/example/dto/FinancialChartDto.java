@@ -1,4 +1,4 @@
-package com.example.salesservice.dto;
+package com.example.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
-public class SalesChartResponse {
+public class FinancialChartDto {
 
     private List<Long> data;
 

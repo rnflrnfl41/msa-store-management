@@ -1,4 +1,4 @@
-package com.example.salesservice.dto;
+package com.example.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChartData {
+public class FinancialChartData {
 
     private LocalDate date;
     
