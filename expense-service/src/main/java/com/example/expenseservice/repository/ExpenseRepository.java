@@ -15,7 +15,7 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository <Expense, Integer> {
 
-    Page<Expense> findByExpenseDateAndStoreIdOrderById(LocalDate expenseDate, int storeId, Pageable pageable);
+    Page<Expense> findByExpenseDateAndStoreIdOrderByIdDesc(LocalDate expenseDate, int storeId, Pageable pageable);
 
     @Query("select new com.example.dto.FinancialSummary(" +
             "COALESCE(sum(e.amount),0),count(e) " +
