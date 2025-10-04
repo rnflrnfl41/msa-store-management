@@ -1,6 +1,6 @@
 package com.example.salesservice.repository;
 
-import com.example.salesservice.dto.ChartData;
+import com.example.dto.FinancialChartData;
 import com.example.dto.FinancialSummary;
 import com.example.salesservice.entity.Visit;
 import org.springframework.data.domain.Page;
@@ -29,7 +29,7 @@ public interface VisitRepository extends JpaRepository <Visit, Integer> {
     FinancialSummary getSummarySalesMonth(int month, int storeId);
 
     // 월별 차트 데이터
-    @Query("select new com.example.salesservice.dto.ChartData(" +
+    @Query("select new com.example.dto.FinancialChartData(" +
             "v.visitDate, " +
             "COALESCE(sum(v.finalServiceAmount),0), " +
             "count(v)" +
@@ -38,10 +38,10 @@ public interface VisitRepository extends JpaRepository <Visit, Integer> {
             " v.visitDate between :startDate and :endDate " +
             " group by year(v.visitDate), month(v.visitDate) " +
             " order by year(v.visitDate), month(v.visitDate)")
-    List<ChartData> getMonthlyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
+    List<FinancialChartData> getMonthlyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
 
     // 일별 차트 데이터
-    @Query("select new com.example.salesservice.dto.ChartData(" +
+    @Query("select new com.example.dto.FinancialChartData(" +
             "v.visitDate, " +
             "COALESCE(sum(v.finalServiceAmount),0), " +
             "count(v)" +
@@ -50,7 +50,7 @@ public interface VisitRepository extends JpaRepository <Visit, Integer> {
             " v.visitDate between :startDate and :endDate " +
             " group by v.visitDate " +
             " order by v.visitDate")
-    List<ChartData> getDailyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
+    List<FinancialChartData> getDailyChartDataByPeriod(LocalDate startDate, LocalDate endDate, int storeId);
 
     Page<Visit> findByVisitDateAndStoreId(LocalDate visitDate, int storeId, Pageable pageable);
 

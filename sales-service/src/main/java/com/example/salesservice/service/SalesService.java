@@ -1,8 +1,6 @@
 package com.example.salesservice.service;
 
-import com.example.dto.BenefitUseRequest;
-import com.example.dto.FinancialSummary;
-import com.example.dto.FinancialSummaryResponse;
+import com.example.dto.*;
 import com.example.exception.CommonException;
 import com.example.exception.CommonExceptionCode;
 import com.example.salesservice.dto.*;
@@ -13,6 +11,7 @@ import com.example.salesservice.repository.ErrorLogRepository;
 import com.example.salesservice.repository.PaymentRepository;
 import com.example.salesservice.repository.ServiceItemRepository;
 import com.example.salesservice.repository.VisitRepository;
+import com.example.util.ChartUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -124,91 +123,17 @@ public class SalesService {
 
     }
 
-    public SalesChartResponse getChartData(String type, LocalDate startDate, LocalDate endDate, Integer storeId) {
+    public FinancialChartDto getChartData(String type, LocalDate startDate, LocalDate endDate, Integer storeId) {
 
         if ("monthly".equals(type)) {
-            return getMonthlyChartData(startDate, endDate, storeId);
+            List<FinancialChartData> chartDataList = visitRepository.getMonthlyChartDataByPeriod(startDate, endDate, storeId);
+            return ChartUtil.getMonthlyChartData(chartDataList, startDate, endDate);
         } else if ("daily".equals(type)) {
-            return getDailyChartData(startDate, endDate, storeId);
+            List<FinancialChartData> chartDataList = visitRepository.getDailyChartDataByPeriod(startDate, endDate, storeId);
+            return ChartUtil.getDailyChartData(chartDataList, startDate, endDate);
         } else {
             throw new IllegalArgumentException("Invalid chart type: " + type);
         }
-    }
-
-    private SalesChartResponse getMonthlyChartData(LocalDate startDate, LocalDate endDate, Integer storeId) {
-        List<ChartData> chartDataList = visitRepository.getMonthlyChartDataByPeriod(startDate, endDate, storeId);
-
-        // 데이터를 Map으로 변환 (년월을 키로) - 성능 최적화
-        Map<YearMonth, Long> dataMap = chartDataList.stream()
-                .collect(Collectors.toMap(
-                    chartData -> YearMonth.from(chartData.getDate()),
-                    ChartData::getAmount,
-                    Long::sum, // 중복 키 처리 (같은 월에 여러 데이터가 있을 경우)
-                    java.util.LinkedHashMap::new // 순서 보장
-                ));
-
-        // count도 Map으로 변환
-        Map<YearMonth, Long> countMap = chartDataList.stream()
-                .collect(Collectors.toMap(
-                    chartData -> YearMonth.from(chartData.getDate()),
-                    ChartData::getCount,
-                    Long::sum, // 중복 키 처리
-                    java.util.LinkedHashMap::new // 순서 보장
-                ));
-
-        List<Long> data = new ArrayList<>();
-        List<LocalDate> dates = new ArrayList<>();
-        List<Long> counts = new ArrayList<>();
-
-        // 월별로 모든 날짜를 생성하고 빈 날짜는 0으로 채움
-        YearMonth current = YearMonth.from(startDate);
-        YearMonth end = YearMonth.from(endDate);
-
-        while (!current.isAfter(end)) {
-            LocalDate firstDayOfMonth = current.atDay(1);
-            dates.add(firstDayOfMonth);
-            data.add(dataMap.getOrDefault(current, 0L));
-            counts.add(countMap.getOrDefault(current, 0L));
-            current = current.plusMonths(1);
-        }
-
-        return SalesChartResponse.builder()
-                .data(data)
-                .dates(dates)
-                .counts(counts)
-                .build();
-    }
-
-    private SalesChartResponse getDailyChartData(LocalDate startDate, LocalDate endDate, Integer storeId) {
-        List<ChartData> chartDataList = visitRepository.getDailyChartDataByPeriod(startDate, endDate, storeId);
-
-        // 데이터를 Map으로 변환 (날짜를 키로)
-        Map<LocalDate, Long> dataMap = chartDataList.stream()
-                .collect(Collectors.toMap(ChartData::getDate, ChartData::getAmount));
-
-        // count도 Map으로 변환
-        Map<LocalDate, Long> countMap = chartDataList.stream()
-                .collect(Collectors.toMap(ChartData::getDate, ChartData::getCount));
-
-        List<Long> data = new ArrayList<>();
-        List<LocalDate> dates = new ArrayList<>();
-        List<Long> counts = new ArrayList<>();
-
-        // 일별로 모든 날짜를 생성하고 빈 날짜는 0으로 채움
-        LocalDate current = startDate;
-
-        while (!current.isAfter(endDate)) {
-            dates.add(current);
-            data.add(dataMap.getOrDefault(current, 0L));
-            counts.add(countMap.getOrDefault(current, 0L));
-            current = current.plusDays(1);
-        }
-
-        return SalesChartResponse.builder()
-                .data(data)
-                .dates(dates)
-                .counts(counts)
-                .build();
     }
 
     public SalesDataResponse getSalesList(LocalDate date, int page, int limit, Integer storeId) {
