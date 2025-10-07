@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -121,6 +122,12 @@ public class SalesService {
                 .month(monthSummary)
                 .build();
 
+    }
+
+    public long getTodaySales(Integer storeId) {
+        LocalDate today = LocalDate.now();
+        FinancialSummary todaySummary = visitRepository.getSummarySalesDate(today,storeId);
+        return todaySummary.getAmount();
     }
 
     public FinancialChartDto getChartData(String type, LocalDate startDate, LocalDate endDate, Integer storeId) {
@@ -236,4 +243,5 @@ public class SalesService {
         serviceItemRepository.deleteByVisit(visit);
         visitRepository.delete(visit);
     }
+
 }

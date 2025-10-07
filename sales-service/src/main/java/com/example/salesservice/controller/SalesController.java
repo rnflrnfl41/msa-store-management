@@ -6,6 +6,7 @@ import com.example.dto.FinancialChartDto;
 import com.example.salesservice.dto.*;
 import com.example.salesservice.service.SalesService;
 import com.example.util.ResponseUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +54,20 @@ public class SalesController {
         salesService.registerSales(registrationDto, storeId);
         return ResponseUtil.created("매출 등록이 완료되었습니다");
     }
+
+    /**
+     * 오늘 매출 조회
+     * @param storeIdHeader
+     * @return
+     */
+    @GetMapping("/summary/today")
+    public ResponseEntity<ApiResponse<Long>> getTodaySales(
+            @RequestHeader(X_USER_STORE_ID) String storeIdHeader
+    ) {
+        Integer storeId = Integer.parseInt(storeIdHeader);
+        return ResponseUtil.success(salesService.getTodaySales(storeId));
+    }
+
 
     /**
      * 요약 데이터 조회 (오늘/이번달 매출)
