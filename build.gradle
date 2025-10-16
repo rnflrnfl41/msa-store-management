@@ -43,6 +43,23 @@ subprojects {
     //모든 프로젝트 공통 테스트 라이브러리
     dependencies {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        // Logging
+        implementation 'org.slf4j:slf4j-api:2.0.9'
+
+        implementation 'org.modelmapper:modelmapper:2.1.1'
+
+        implementation 'mysql:mysql-connector-java:8.0.33'
+
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+        testImplementation 'org.springframework.security:spring-security-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+        // Lombok
+        compileOnly 'org.projectlombok:lombok:1.18.30'
+        annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
     }
 
     //테스트 실행 방식 설정
